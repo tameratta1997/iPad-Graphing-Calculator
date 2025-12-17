@@ -112,6 +112,9 @@ with st.sidebar:
     x_max = st.number_input("X Max", value=10.0)
     y_min = st.number_input("Y Min", value=-10.0)
     y_max = st.number_input("Y Max", value=10.0)
+    
+    st.divider()
+    st.markdown("👨‍💻 **Developed By Tamer Elwakeel**")
 
 # -----------------------------------------------------------------------------
 # Main Area - Title and Graph
@@ -214,4 +217,6 @@ st.markdown("""
 2. Tap the **Share icon** (square with arrow).
 3. Select **"Add to Home Screen"**.
 4. Now it works like a real app!
+---
+✨ **Developed By Tamer Elwakeel** | *Python Diploma 2024*
 """)
