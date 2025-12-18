@@ -38,7 +38,7 @@ st.markdown("""
         color: black;
     }
     
-    /* SIDEBAR BUTTONS - Force rectangular navy 3D style */
+    /* SIDEBAR BUTTONS - Force rectangular shape for ALL buttons */
     section[data-testid="stSidebar"] button,
     div[data-testid="stSidebar"] button,
     [data-testid="stSidebar"] .stButton > button {
@@ -50,12 +50,13 @@ st.markdown("""
         padding: 12px 20px !important;
     }
     
-    /* Navy 3D styling for sidebar action buttons */
-    section[data-testid="stSidebar"] button[key="add_plot_btn"],
-    section[data-testid="stSidebar"] button[key="clear_all_btn"],
-    div[data-testid="stSidebar"] button[key="add_plot_btn"],
-    div[data-testid="stSidebar"] button[key="clear_all_btn"] {
+    /* Navy 3D styling - MAXIMUM SPECIFICITY */
+    [data-testid="stSidebar"] button[data-testid="baseButton-secondary"][aria-label*="Add"],
+    [data-testid="stSidebar"] button[data-testid="baseButton-secondary"][aria-label*="Clear"],
+    section[data-testid="stSidebar"] div.stButton > button[kind="secondary"],
+    div[data-testid="stSidebar"] div.stButton > button[kind="secondary"] {
         background: linear-gradient(145deg, #1e3a8a, #1e40af) !important;
+        background-color: #1e40af !important;
         color: white !important;
         font-weight: 600 !important;
         border: none !important;
@@ -65,11 +66,12 @@ st.markdown("""
             inset 0 2px 4px rgba(255, 255, 255, 0.2) !important;
     }
     
-    section[data-testid="stSidebar"] button[key="add_plot_btn"]:hover,
-    section[data-testid="stSidebar"] button[key="clear_all_btn"]:hover,
-    div[data-testid="stSidebar"] button[key="add_plot_btn"]:hover,
-    div[data-testid="stSidebar"] button[key="clear_all_btn"]:hover {
+    [data-testid="stSidebar"] button[data-testid="baseButton-secondary"][aria-label*="Add"]:hover,
+    [data-testid="stSidebar"] button[data-testid="baseButton-secondary"][aria-label*="Clear"]:hover,
+    section[data-testid="stSidebar"] div.stButton > button[kind="secondary"]:hover,
+    div[data-testid="stSidebar"] div.stButton > button[kind="secondary"]:hover {
         background: linear-gradient(145deg, #2563eb, #3b82f6) !important;
+        background-color: #3b82f6 !important;
         transform: translateY(-2px);
         box-shadow: 
             0 10px 20px rgba(37, 99, 235, 0.5),
@@ -77,10 +79,10 @@ st.markdown("""
             inset 0 2px 4px rgba(255, 255, 255, 0.3) !important;
     }
     
-    section[data-testid="stSidebar"] button[key="add_plot_btn"]:active,
-    section[data-testid="stSidebar"] button[key="clear_all_btn"]:active,
-    div[data-testid="stSidebar"] button[key="add_plot_btn"]:active,
-    div[data-testid="stSidebar"] button[key="clear_all_btn"]:active {
+    [data-testid="stSidebar"] button[data-testid="baseButton-secondary"][aria-label*="Add"]:active,
+    [data-testid="stSidebar"] button[data-testid="baseButton-secondary"][aria-label*="Clear"]:active,
+    section[data-testid="stSidebar"] div.stButton > button[kind="secondary"]:active,
+    div[data-testid="stSidebar"] div.stButton > button[kind="secondary"]:active {
         transform: translateY(1px);
         box-shadow: 
             0 3px 6px rgba(30, 58, 138, 0.4),
