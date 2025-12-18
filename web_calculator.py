@@ -23,6 +23,8 @@ st.markdown("""
         background-color: #1c1c1c;
         color: white;
     }
+    
+    /* Default calculator buttons (main area) */
     .stButton>button {
         width: 100%;
         border-radius: 5px;
@@ -36,40 +38,53 @@ st.markdown("""
         color: black;
     }
     
-    /* 3D Navy Buttons for Sidebar Actions */
-    .navy-3d-button {
-        width: 100%;
-        padding: 12px 24px;
-        font-size: 16px;
-        font-weight: 600;
-        color: white;
-        background: linear-gradient(145deg, #1e3a8a, #1e40af);
-        border: none;
-        border-radius: 8px;
-        box-shadow: 
-            0 8px 16px rgba(30, 58, 138, 0.4),
-            inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-            inset 0 2px 4px rgba(255, 255, 255, 0.2);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-align: center;
-        margin: 8px 0;
+    /* SIDEBAR BUTTONS - Force rectangular navy 3D style */
+    section[data-testid="stSidebar"] button,
+    div[data-testid="stSidebar"] button,
+    [data-testid="stSidebar"] .stButton > button {
+        aspect-ratio: auto !important;
+        border-radius: 8px !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 48px !important;
+        padding: 12px 20px !important;
     }
     
-    .navy-3d-button:hover {
-        background: linear-gradient(145deg, #2563eb, #3b82f6);
+    /* Navy 3D styling for sidebar action buttons */
+    section[data-testid="stSidebar"] button[key="add_plot_btn"],
+    section[data-testid="stSidebar"] button[key="clear_all_btn"],
+    div[data-testid="stSidebar"] button[key="add_plot_btn"],
+    div[data-testid="stSidebar"] button[key="clear_all_btn"] {
+        background: linear-gradient(145deg, #1e3a8a, #1e40af) !important;
+        color: white !important;
+        font-weight: 600 !important;
+        border: none !important;
+        box-shadow: 
+            0 6px 12px rgba(30, 58, 138, 0.4),
+            inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+            inset 0 2px 4px rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    section[data-testid="stSidebar"] button[key="add_plot_btn"]:hover,
+    section[data-testid="stSidebar"] button[key="clear_all_btn"]:hover,
+    div[data-testid="stSidebar"] button[key="add_plot_btn"]:hover,
+    div[data-testid="stSidebar"] button[key="clear_all_btn"]:hover {
+        background: linear-gradient(145deg, #2563eb, #3b82f6) !important;
         transform: translateY(-2px);
         box-shadow: 
-            0 12px 24px rgba(37, 99, 235, 0.5),
+            0 10px 20px rgba(37, 99, 235, 0.5),
             inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-            inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            inset 0 2px 4px rgba(255, 255, 255, 0.3) !important;
     }
     
-    .navy-3d-button:active {
+    section[data-testid="stSidebar"] button[key="add_plot_btn"]:active,
+    section[data-testid="stSidebar"] button[key="clear_all_btn"]:active,
+    div[data-testid="stSidebar"] button[key="add_plot_btn"]:active,
+    div[data-testid="stSidebar"] button[key="clear_all_btn"]:active {
         transform: translateY(1px);
         box-shadow: 
-            0 4px 8px rgba(30, 58, 138, 0.3),
-            inset 0 2px 4px rgba(0, 0, 0, 0.4);
+            0 3px 6px rgba(30, 58, 138, 0.4),
+            inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
     }
     
     .stTextInput>div>div>input {
@@ -126,43 +141,6 @@ with st.sidebar:
     st.subheader("Add Function")
     new_func = st.text_input("f(x) =", placeholder="e.g. sin(x) + 2", key="func_input")
     
-    # Custom 3D Navy Button CSS - Applied globally to specific buttons
-    st.markdown("""
-    <style>
-        /* Target the Add Plot button specifically */
-        div[data-testid="stSidebar"] button[kind="secondary"]:nth-of-type(1) {
-            background: linear-gradient(145deg, #1e3a8a, #1e40af) !important;
-            color: white !important;
-            font-weight: 600 !important;
-            border-radius: 8px !important;
-            padding: 12px 24px !important;
-            border: none !important;
-            box-shadow: 
-                0 6px 12px rgba(30, 58, 138, 0.4),
-                inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-                inset 0 2px 4px rgba(255, 255, 255, 0.2) !important;
-            height: auto !important;
-            aspect-ratio: auto !important;
-        }
-        
-        div[data-testid="stSidebar"] button[kind="secondary"]:nth-of-type(1):hover {
-            background: linear-gradient(145deg, #2563eb, #3b82f6) !important;
-            transform: translateY(-2px);
-            box-shadow: 
-                0 10px 20px rgba(37, 99, 235, 0.5),
-                inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-                inset 0 2px 4px rgba(255, 255, 255, 0.3) !important;
-        }
-        
-        div[data-testid="stSidebar"] button[kind="secondary"]:nth-of-type(1):active {
-            transform: translateY(1px);
-            box-shadow: 
-                0 3px 6px rgba(30, 58, 138, 0.4),
-                inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
-        }
-    </style>
-    """, unsafe_allow_html=True)
-    
     add_clicked = st.button("➕ Add to Plot", key="add_plot_btn", use_container_width=True)
     if add_clicked:
         if new_func and new_func not in st.session_state.functions:
@@ -176,43 +154,6 @@ with st.sidebar:
         if cols[1].button("🗑️", key=f"del_{i}"):
             st.session_state.functions.pop(i)
             st.rerun()
-
-    # Clear All Button with proper styling
-    st.markdown("""
-    <style>
-        /* Target Clear All button - it's after all the delete buttons */
-        div[data-testid="stSidebar"] div.element-container:has(button[key="clear_all_btn"]) button {
-            background: linear-gradient(145deg, #1e3a8a, #1e40af) !important;
-            color: white !important;
-            font-weight: 600 !important;
-            border-radius: 8px !important;
-            padding: 12px 24px !important;
-            border: none !important;
-            box-shadow: 
-                0 6px 12px rgba(30, 58, 138, 0.4),
-                inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-                inset 0 2px 4px rgba(255, 255, 255, 0.2) !important;
-            height: auto !important;
-            aspect-ratio: auto !important;
-        }
-        
-        div[data-testid="stSidebar"] div.element-container:has(button[key="clear_all_btn"]) button:hover {
-            background: linear-gradient(145deg, #2563eb, #3b82f6) !important;
-            transform: translateY(-2px);
-            box-shadow: 
-                0 10px 20px rgba(37, 99, 235, 0.5),
-                inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-                inset 0 2px 4px rgba(255, 255, 255, 0.3) !important;
-        }
-        
-        div[data-testid="stSidebar"] div.element-container:has(button[key="clear_all_btn"]) button:active {
-            transform: translateY(1px);
-            box-shadow: 
-                0 3px 6px rgba(30, 58, 138, 0.4),
-                inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
-        }
-    </style>
-    """, unsafe_allow_html=True)
     
     clear_clicked = st.button("🗑️ Clear All Functions", key="clear_all_btn", use_container_width=True)
     if clear_clicked:
