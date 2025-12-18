@@ -380,53 +380,24 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Wrap entire calculator in a compact container
-st.markdown("""
-<style>
-    .calculator-wrapper {
-        max-width: 500px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-    .mode-toggle-container {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-bottom: 15px;
-    }
-    .mode-toggle-btn {
-        padding: 8px 20px;
-        font-size: 0.85rem;
-        border-radius: 6px;
-        border: 2px solid #90EE90;
-        background: #2d2d2d;
-        color: white;
-        cursor: pointer;
-        min-width: 120px;
-        text-align: center;
-    }
-    .mode-toggle-btn:hover {
-        background: #90EE90;
-        color: black;
-    }
-</style>
-<div class="calculator-wrapper">
-""", unsafe_allow_html=True)
+# Force narrow calculator by using 3-column layout with narrow center
+spacer_left, calc_column, spacer_right = st.columns([2, 3, 2])
 
-# Calculator mode toggle buttons - using columns but constrained
-col_spacer1, col1, col2, col_spacer2 = st.columns([1, 1, 1, 1])
-with col1:
-    if st.button("🍏 Basic", key="basic_calc_btn", use_container_width=True):
-        st.session_state.calculator_mode = "basic"
-        st.rerun()
-with col2:
-    if st.button("🍏 Scientific", key="scientific_calc_btn", use_container_width=True):
-        st.session_state.calculator_mode = "scientific"
-        st.rerun()
+with calc_column:
+    # Calculator mode toggle buttons - now within narrow column
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🍏 Basic", key="basic_calc_btn", use_container_width=True):
+            st.session_state.calculator_mode = "basic"
+            st.rerun()
+    with col2:
+        if st.button("🍏 Scientific", key="scientific_calc_btn", use_container_width=True):
+            st.session_state.calculator_mode = "scientific"
+            st.rerun()
 
-# Display current mode
-mode_name = "Basic Calculator" if st.session_state.get("calculator_mode", "scientific") == "basic" else "Scientific Calculator"
-st.markdown(f"<h4 style='text-align: center; color: #90EE90; margin-top: 5px; margin-bottom: 15px;'>{mode_name}</h4>", unsafe_allow_html=True)
+    # Display current mode
+    mode_name = "Basic Calculator" if st.session_state.get("calculator_mode", "scientific") == "basic" else "Scientific Calculator"
+    st.markdown(f"<h4 style='text-align: center; color: #90EE90; margin:10px 0;'>{mode_name}</h4>", unsafe_allow_html=True)
 
 # Logic
 if "calc_expression" not in st.session_state:
@@ -588,93 +559,87 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Display
-st.markdown(f"""<div class='calc-display'>{st.session_state.calc_expression if st.session_state.calc_expression else "0"}</div>""", unsafe_allow_html=True)
+    # Display
+    st.markdown(f"""<div class='calc-display'>{st.session_state.calc_expression if st.session_state.calc_expression else "0"}</div>""", unsafe_allow_html=True)
 
-# Conditional Calculator Layout Based on Mode
-if st.session_state.calculator_mode == "basic":
-    # Wrap in container to constrain width
-    st.markdown('<div class="basic-calculator-container">', unsafe_allow_html=True)
-    
-    # BASIC CALCULATOR (4x6 grid like iOS calculator)
-    basic_buttons = [
-        # Row 1
-        ("AC", "AC", "light"), ("+/-", "+/-", "light"), ("%", "%", "light"), ("÷", "÷", "primary"),
-        # Row 2
-        ("7", "7", "default"), ("8", "8", "default"), ("9", "9", "default"), ("×", "×", "primary"),
-        # Row 3
-        ("4", "4", "default"), ("5", "5", "default"), ("6", "6", "default"), ("−", "-", "primary"),
-        # Row 4
-        ("1", "1", "default"), ("2", "2", "default"), ("3", "3", "default"), ("+", "+", "primary"),
-        # Row 5
-        ("0", "0", "default"), (".", ".", "default"), ("⌫", "⌫", "light"), ("=", "=", "primary"),
-    ]
-    
-    # Render 4-column basic grid
-    idx = 0
-    for row in range(5):
-        cols = st.columns(4, gap="small")
-        for c in cols:
-            if idx < len(basic_buttons):
-                label, val, kind = basic_buttons[idx]
-                key_type = "primary" if kind == "primary" else "secondary"
-                c.button(label, on_click=calc_press, args=(val,), type=key_type, use_container_width=True, key=f"basic_btn_{idx}")
-                idx += 1
-    
-    # Close container
-    st.markdown('</div>', unsafe_allow_html=True)
-
-else:  # scientific mode
-    # SCIENTIFIC CALCULATOR (10x5 grid)
-    # Dynamic button labels based on mode
-    sin_label = "asin" if st.session_state.second_mode else "sin"
-    cos_label = "acos" if st.session_state.second_mode else "cos"
-    tan_label = "atan" if st.session_state.second_mode else "tan"
-    sin_val = "asin(" if st.session_state.second_mode else "sin("
-    cos_val = "acos(" if st.session_state.second_mode else "cos("
-    tan_val = "atan(" if st.session_state.second_mode else "tan("
-
-    buttons = [
-        # Row 1
-        ("(", "(", ""), (")", ")", ""), ("mc", "mc", ""), ("m+", "m+", ""), ("m-", "m-", ""), 
-        ("mr", "mr", ""), ("AC", "AC", "light"), ("+/-", "-", "light"), ("%", "/100", "light"), ("÷", "÷", "primary"),
-        # Row 2
-        ("2ⁿᵈ", "2nd", ""), ("x²", "²", ""), ("x³", "³", ""), ("xʸ", "^", ""), ("eˣ", "e^", ""), 
-        ("10ˣ", "10^", ""), ("7", "7", "light"), ("8", "8", "light"), ("9", "9", "light"), ("×", "×", "primary"),
-        # Row 3
-        ("¹/x", "**-1", ""), ("²√x", "√(", ""), ("³√x", "**(1/3)", ""), ("ʸ√x", "**(1/", ""), ("ln", "ln(", ""), 
-        ("log₁₀", "log₁₀(", ""), ("4", "4", "light"), ("5", "5", "light"), ("6", "6", "light"), ("−", "-", "primary"),
-        # Row 4 - Dynamic trig labels
-        ("x!", "!", ""), (sin_label, sin_val, ""), (cos_label, cos_val, ""), (tan_label, tan_val, ""), ("e", "e", ""), 
-        ("EE", "*10^", ""), ("1", "1", "light"), ("2", "2", "light"), ("3", "3", "light"), ("+", "+", "primary"),
-        # Row 5 - Dynamic angle mode
-        (st.session_state.angle_mode, "angle_toggle", ""), ("sinh", "sinh(", ""), ("cosh", "cosh(", ""), ("tanh", "tanh(", ""), ("π", "π", ""), 
-        ("Rand", "Rand", ""), ("0", "0", "light"), (".", ".", "light"), ("+/-", "+/-", "light"), ("=", "=", "primary"),
-    ]
-
-    # Render 10-column Grid
-    idx = 0
-    for row in range(5):
-        cols = st.columns(10, gap="small")
-        for c in cols:
-            if idx < len(buttons):
-                label, val, kind = buttons[idx]
-                # Skip empty buttons
-                if label:  
-                    # Use primary type for orange buttons, default for others
+    # Conditional Calculator Layout Based on Mode
+    if st.session_state.calculator_mode == "basic":
+        # Remove container div wrapping since we're using column layout
+        
+        # BASIC CALCULATOR (4x6 grid like iOS calculator)
+        basic_buttons = [
+            # Row 1
+            ("AC", "AC", "light"), ("+/-", "+/-", "light"), ("%", "%", "light"), ("÷", "÷", "primary"),
+            # Row 2
+            ("7", "7", "default"), ("8", "8", "default"), ("9", "9", "default"), ("×", "×", "primary"),
+            # Row 3
+            ("4", "4", "default"), ("5", "5", "default"), ("6", "6", "default"), ("−", "-", "primary"),
+            # Row 4
+            ("1", "1", "default"), ("2", "2", "default"), ("3", "3", "default"), ("+", "+", "primary"),
+            # Row 5
+            ("0", "0", "default"), (".", ".", "default"), ("⌫", "⌫", "light"), ("=", "=", "primary"),
+        ]
+        
+        # Render 4-column basic grid
+        idx = 0
+        for row in range(5):
+            cols = st.columns(4, gap="small")
+            for c in cols:
+                if idx < len(basic_buttons):
+                    label, val, kind = basic_buttons[idx]
                     key_type = "primary" if kind == "primary" else "secondary"
-                    
-                    # Special handling for mode toggle buttons
-                    if val == "2nd":
-                        c.button(label, on_click=toggle_second_mode, type=key_type, use_container_width=True, key=f"calc_btn_{idx}")
-                    elif val == "angle_toggle":
-                        c.button(label, on_click=toggle_angle_mode, type=key_type, use_container_width=True, key=f"calc_btn_{idx}")
-                    else:
-                        c.button(label, on_click=calc_press, args=(val,), type=key_type, use_container_width=True, key=f"calc_btn_{idx}")
-                idx += 1
+                    c.button(label, on_click=calc_press, args=(val,), type=key_type, use_container_width=True, key=f"basic_btn_{idx}")
+                    idx += 1
 
-# Close calculator wrapper
-st.markdown('</div>', unsafe_allow_html=True)
+    else:  # scientific mode
+        # SCIENTIFIC CALCULATOR (10x5 grid)
+        # Dynamic button labels based on mode
+        sin_label = "asin" if st.session_state.second_mode else "sin"
+        cos_label = "acos" if st.session_state.second_mode else "cos"
+        tan_label = "atan" if st.session_state.second_mode else "tan"
+        sin_val = "asin(" if st.session_state.second_mode else "sin("
+        cos_val = "acos(" if st.session_state.second_mode else "cos("
+        tan_val = "atan(" if st.session_state.second_mode else "tan("
+
+        buttons = [
+            # Row 1
+            ("(", "(", ""), (")", ")", ""), ("mc", "mc", ""), ("m+", "m+", ""), ("m-", "m-", ""), 
+            ("mr", "mr", ""), ("AC", "AC", "light"), ("+/-", "-", "light"), ("%", "/100", "light"), ("÷", "÷", "primary"),
+            # Row 2
+            ("2ⁿᵈ", "2nd", ""), ("x²", "²", ""), ("x³", "³", ""), ("xʸ", "^", ""), ("eˣ", "e^", ""), 
+            ("10ˣ", "10^", ""), ("7", "7", "light"), ("8", "8", "light"), ("9", "9", "light"), ("×", "×", "primary"),
+            # Row 3
+            ("¹/x", "**-1", ""), ("²√x", "√(", ""), ("³√x", "**(1/3)", ""), ("ʸ√x", "**(1/", ""), ("ln", "ln(", ""), 
+            ("log₁₀", "log₁₀(", ""), ("4", "4", "light"), ("5", "5", "light"), ("6", "6", "light"), ("−", "-", "primary"),
+            # Row 4 - Dynamic trig labels
+            ("x!", "!", ""), (sin_label, sin_val, ""), (cos_label, cos_val, ""), (tan_label, tan_val, ""), ("e", "e", ""), 
+            ("EE", "*10^", ""), ("1", "1", "light"), ("2", "2", "light"), ("3", "3", "light"), ("+", "+", "primary"),
+            # Row 5 - Dynamic angle mode
+            (st.session_state.angle_mode, "angle_toggle", ""), ("sinh", "sinh(", ""), ("cosh", "cosh(", ""), ("tanh", "tanh(", ""), ("π", "π", ""), 
+            ("Rand", "Rand", ""), ("0", "0", "light"), (".", ".", "light"), ("+/-", "+/-", "light"), ("=", "=", "primary"),
+        ]
+
+        # Render 10-column Grid
+        idx = 0
+        for row in range(5):
+            cols = st.columns(10, gap="small")
+            for c in cols:
+                if idx < len(buttons):
+                    label, val, kind = buttons[idx]
+                    # Skip empty buttons
+                    if label:  
+                        # Use primary type for orange buttons, default for others
+                        key_type = "primary" if kind == "primary" else "secondary"
+                        
+                        # Special handling for mode toggle buttons
+                        if val == "2nd":
+                            c.button(label, on_click=toggle_second_mode, type=key_type, use_container_width=True, key=f"calc_btn_{idx}")
+                        elif val == "angle_toggle":
+                            c.button(label, on_click=toggle_angle_mode, type=key_type, use_container_width=True, key=f"calc_btn_{idx}")
+                        else:
+                            c.button(label, on_click=calc_press, args=(val,), type=key_type, use_container_width=True, key=f"calc_btn_{idx}")
+                    idx += 1
+
 
 st.markdown("""
 ---
