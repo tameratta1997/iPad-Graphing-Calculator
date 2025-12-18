@@ -367,6 +367,15 @@ st.markdown("""
     /* Hide the default streamlit top padding to make it look like an app */
     header { visibility: hidden; }
     footer { visibility: hidden; }
+    
+    /* Mode toggle buttons styling */
+    button[key="basic_calc_btn"],
+    button[key="scientific_calc_btn"] {
+        height: 40px !important;
+        min-height: 40px !important;
+        font-size: 0.9rem !important;
+        padding: 8px 16px !important;
+    }
 
 </style>
 """, unsafe_allow_html=True)
@@ -374,13 +383,17 @@ st.markdown("""
 # Calculator mode toggle buttons
 col1, col2 = st.columns(2)
 with col1:
-    if st.button("🍏 Basic Calculator", key="basic_calc_btn", use_container_width=True):
+    if st.button("🍏 Basic", key="basic_calc_btn", use_container_width=True):
         st.session_state.calculator_mode = "basic"
         st.rerun()
 with col2:
-    if st.button("🍏 Scientific Calculator", key="scientific_calc_btn", use_container_width=True):
+    if st.button("🍏 Scientific", key="scientific_calc_btn", use_container_width=True):
         st.session_state.calculator_mode = "scientific"
         st.rerun()
+
+# Display current mode
+mode_name = "Basic Calculator" if st.session_state.get("calculator_mode", "scientific") == "basic" else "Scientific Calculator"
+st.markdown(f"<h3 style='text-align: center; color: #90EE90;'>{mode_name}</h3>", unsafe_allow_html=True)
 
 # Logic
 if "calc_expression" not in st.session_state:
@@ -531,18 +544,25 @@ st.markdown("""
         transform: scale(0.95);
     }
     
+    /* BASIC CALCULATOR - Constrain width */
+    .basic-calculator-container {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
     header, footer { visibility: hidden; }
 
 </style>
 """, unsafe_allow_html=True)
-
-st.subheader(" Scientific Calculator")
 
 # Display
 st.markdown(f"""<div class='calc-display'>{st.session_state.calc_expression if st.session_state.calc_expression else "0"}</div>""", unsafe_allow_html=True)
 
 # Conditional Calculator Layout Based on Mode
 if st.session_state.calculator_mode == "basic":
+    # Wrap in container to constrain width
+    st.markdown('<div class="basic-calculator-container">', unsafe_allow_html=True)
+    
     # BASIC CALCULATOR (4x6 grid like iOS calculator)
     basic_buttons = [
         # Row 1
@@ -567,6 +587,9 @@ if st.session_state.calculator_mode == "basic":
                 key_type = "primary" if kind == "primary" else "secondary"
                 c.button(label, on_click=calc_press, args=(val,), type=key_type, use_container_width=True, key=f"basic_btn_{idx}")
                 idx += 1
+    
+    # Close container
+    st.markdown('</div>', unsafe_allow_html=True)
 
 else:  # scientific mode
     # SCIENTIFIC CALCULATOR (10x5 grid)
