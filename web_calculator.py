@@ -196,88 +196,128 @@ else:
     st.pyplot(fig)
 
 # -----------------------------------------------------------------------------
-# Interactive Calculator GUI
+# Professional Calculator GUI
 # -----------------------------------------------------------------------------
 st.divider()
-st.subheader("🔢 Calculator")
 
-# Initialize session state for the calculator display
+# Wrapper container for the calculator to apply scoped CSS if possible, 
+# but for now we rely on the specific button order.
+
+st.markdown("""
+<style>
+    /* Calculator Screen Styles */
+    div.stTextInput > div > div > input {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 2.5rem;
+        background-color: #000000;
+        color: #fff;
+        text-align: right;
+        border-radius: 10px;
+        padding: 15px;
+        border: 1px solid #333;
+    }
+    
+    /* General Button Styles */
+    div.stButton > button {
+        width: 100%;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        font-size: 20px;
+        font-weight: 500;
+        border-radius: 50px; /* Circular / Pill shape */
+        border: none;
+        transition: filter 0.2s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    
+    div.stButton > button:active {
+        filter: brightness(1.2);
+        transform: scale(0.98);
+    }
+
+    /* Number Buttons (Dark Grey) */
+    div.stButton > button:first-child {
+        background-color: #333333;
+        color: white;
+    }
+
+    /* We can't target specific buttons easily with pure CSS in Streamlit without exact nth-child knowledge 
+       which changes. So we rely on the Python order and inject some specific color overrides via inline styling 
+       hacking or just accept a uniform look with overrides for the special 'Primary' buttons.
+    */
+    
+    /* Override for Primary Buttons (Orange Operators) */
+    div.stButton > button[kind="primary"] {
+        background-color: #ff9f0a !important;
+        color: white !important;
+    }
+    
+    /* Secondary/Function Buttons (Light Grey) - mimicking secondary style if available, 
+       else we stick to dark grey for consistency in this constraint */
+
+</style>
+""", unsafe_allow_html=True)
+
+st.subheader(" Calculator")
+
+# Logic
 if "calc_expression" not in st.session_state:
     st.session_state.calc_expression = ""
 
-def update_expr(val):
-    st.session_state.calc_expression += str(val)
+def calc_press(val):
+    if val == "C":
+        st.session_state.calc_expression = ""
+    elif val == "=":
+        try:
+            expr = st.session_state.calc_expression
+            expr = expr.replace('×', '*').replace('÷', '/')
+            expr = expr.replace('^', '**').replace('π', 'math.pi')
+            expr = expr.replace('sin', 'math.sin').replace('cos', 'math.cos')
+            expr = expr.replace('tan', 'math.tan').replace('√', 'math.sqrt')
+            res = eval(expr, {"__builtins__": None}, {"math": math, "abs": abs})
+            if isinstance(res, float) and res.is_integer():
+                res = int(res)
+            st.session_state.calc_expression = str(res)
+        except:
+            st.session_state.calc_expression = "Error"
+    elif val == "⌫":
+        st.session_state.calc_expression = st.session_state.calc_expression[:-1]
+    else:
+        st.session_state.calc_expression += str(val)
 
-def clear_expr():
-    st.session_state.calc_expression = ""
+# Display
+st.text_input("", value=st.session_state.calc_expression, disabled=True, key="calc_display")
 
-def backspace_expr():
-    st.session_state.calc_expression = st.session_state.calc_expression[:-1]
+# Layout: 4 columns, tight gap
+grid = st.columns(4, gap="small")
 
-def evaluate_expr():
-    try:
-        # Support for caret power operator and common math functions
-        expr = st.session_state.calc_expression
-        expr = expr.replace('^', '**').replace('sqrt', 'math.sqrt')
-        expr = expr.replace('sin', 'math.sin').replace('cos', 'math.cos')
-        expr = expr.replace('tan', 'math.tan').replace('pi', 'math.pi')
-        
-        # Evaluate safely
-        result = eval(expr, {"__builtins__": None}, {"math": math, "abs": abs, "round": round})
-        
-        # round if result is a float mostly integral
-        if isinstance(result, float) and result.is_integer():
-            result = int(result)
-        
-        st.session_state.calc_expression = str(result)
-    except Exception:
-        st.session_state.calc_expression = "Error"
+# Define Keyboard Layout
+# [Label, Value, type]
+# Type: 'default' (grey), 'primary' (orange), 'secondary' (light) - Streamlit only supports default/primary natively
+buttons = [
+    ("sin", "sin(", "default"), ("cos", "cos(", "default"), ("tan", "tan(", "default"), ("C", "C", "primary"),
+    ("√", "sqrt(", "default"),  ("^", "^", "default"),      ("π", "pi", "default"),     ("⌫", "⌫", "primary"),
+    ("7", "7", "default"),      ("8", "8", "default"),      ("9", "9", "default"),      ("÷", "÷", "primary"),
+    ("4", "4", "default"),      ("5", "5", "default"),      ("6", "6", "default"),      ("×", "×", "primary"),
+    ("1", "1", "default"),      ("2", "2", "default"),      ("3", "3", "default"),      ("−", "-", "primary"),
+    ("0", "0", "default"),      (".", ".", "default"),      ("(", "(", "default"),      ("+", "+", "primary"),
+    (")", ")", "default"),      ("", "", "default"),        ("", "", "default"),        ("=", "=", "primary"),
+]
 
-# Display Screen
-st.text_input("Display", key="calc_expression", label_visibility="collapsed")
-
-# Button Grid Layout (Touch-friendly for iPad)
-# Row 1: Scientific
-c1, c2, c3, c4 = st.columns(4)
-c1.button("sin", on_click=update_expr, args=("sin(",))
-c2.button("cos", on_click=update_expr, args=("cos(",))
-c3.button("tan", on_click=update_expr, args=("tan(",))
-c4.button("sqrt", on_click=update_expr, args=("sqrt(",))
-
-# Row 2: Brackets & Power
-c1, c2, c3, c4 = st.columns(4)
-c1.button("(", on_click=update_expr, args=("(",))
-c2.button(")", on_click=update_expr, args=(")",))
-c3.button("^", on_click=update_expr, args=("^",))
-c4.button("C", on_click=clear_expr) # Clear
-
-# Row 3: 7-9 & Division
-c1, c2, c3, c4 = st.columns(4)
-c1.button("7", on_click=update_expr, args=("7",))
-c2.button("8", on_click=update_expr, args=("8",))
-c3.button("9", on_click=update_expr, args=("9",))
-c4.button("÷", on_click=update_expr, args=("/",))
-
-# Row 4: 4-6 & Multiplication
-c1, c2, c3, c4 = st.columns(4)
-c1.button("4", on_click=update_expr, args=("4",))
-c2.button("5", on_click=update_expr, args=("5",))
-c3.button("6", on_click=update_expr, args=("6",))
-c4.button("×", on_click=update_expr, args=("*",))
-
-# Row 5: 1-3 & Subtraction
-c1, c2, c3, c4 = st.columns(4)
-c1.button("1", on_click=update_expr, args=("1",))
-c2.button("2", on_click=update_expr, args=("2",))
-c3.button("3", on_click=update_expr, args=("3",))
-c4.button("−", on_click=update_expr, args=("-",))
-
-# Row 6: 0, Dot, Equal, Addition
-c1, c2, c3, c4 = st.columns(4)
-c1.button("0", on_click=update_expr, args=("0",))
-c2.button(".", on_click=update_expr, args=(".",))
-c3.button("=", on_click=evaluate_expr, type="primary") # Primary color for equals
-c4.button("+", on_click=update_expr, args=("+",))
+# Render Grid
+idx = 0
+for row in range(7):
+    cols = st.columns(4, gap="small")
+    for c in cols:
+        if idx < len(buttons):
+            label, val, kind = buttons[idx]
+            if label:
+                # We use the type='primary' to trigger the orange CSS we wrote above
+                if kind == 'primary':
+                    c.button(label, on_click=calc_press, args=(val,), type="primary", use_container_width=True)
+                else:
+                    c.button(label, on_click=calc_press, args=(val,), use_container_width=True)
+            idx += 1
 
 st.markdown("""
 ---
