@@ -383,6 +383,12 @@ st.markdown("""
     @media only screen and (max-width: 600px) {
         
         /* FORCE COLUMNS TO STAY SIDE-BY-SIDE */
+        /* Target the vertical block that wraps the columns and force it to be horizontal */
+        div[data-testid="stHorizontalBlock"] {
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+        }
+
         /* This targets the columns inside the calculator grid */
         div[data-testid="column"] {
             width: auto !important;
