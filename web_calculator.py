@@ -35,6 +35,43 @@ st.markdown("""
         background-color: #90EE90;
         color: black;
     }
+    
+    /* 3D Navy Buttons for Sidebar Actions */
+    .navy-3d-button {
+        width: 100%;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+        background: linear-gradient(145deg, #1e3a8a, #1e40af);
+        border: none;
+        border-radius: 8px;
+        box-shadow: 
+            0 8px 16px rgba(30, 58, 138, 0.4),
+            inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+            inset 0 2px 4px rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+        margin: 8px 0;
+    }
+    
+    .navy-3d-button:hover {
+        background: linear-gradient(145deg, #2563eb, #3b82f6);
+        transform: translateY(-2px);
+        box-shadow: 
+            0 12px 24px rgba(37, 99, 235, 0.5),
+            inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+            inset 0 2px 4px rgba(255, 255, 255, 0.3);
+    }
+    
+    .navy-3d-button:active {
+        transform: translateY(1px);
+        box-shadow: 
+            0 4px 8px rgba(30, 58, 138, 0.3),
+            inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+    
     .stTextInput>div>div>input {
         background-color: #2d2d2d;
         color: white;
@@ -87,11 +124,35 @@ with st.sidebar:
     st.title("📊 Settings")
     
     st.subheader("Add Function")
-    new_func = st.text_input("f(x) =", placeholder="e.g. sin(x) + 2")
-    if st.button("Add to Plot"):
+    new_func = st.text_input("f(x) =", placeholder="e.g. sin(x) + 2", key="func_input")
+    
+    # Custom 3D Navy Button for Add to Plot
+    add_clicked = st.button("➕ Add to Plot", key="add_plot_btn", use_container_width=True)
+    if add_clicked:
         if new_func and new_func not in st.session_state.functions:
             st.session_state.functions.append(new_func)
             st.rerun()
+    
+    # Add custom styling for this specific button
+    st.markdown("""
+    <style>
+        button[kind="secondary"][data-testid*="add_plot"] {
+            background: linear-gradient(145deg, #1e3a8a, #1e40af) !important;
+            color: white !important;
+            font-weight: 600 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 8px 16px rgba(30, 58, 138, 0.4), 
+                        inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.2) !important;
+            border: none !important;
+        }
+        button[kind="secondary"][data-testid*="add_plot"]:hover {
+            background: linear-gradient(145deg, #2563eb, #3b82f6) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.5) !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
     st.subheader("Manage Functions")
     for i, func in enumerate(st.session_state.functions):
@@ -101,9 +162,33 @@ with st.sidebar:
             st.session_state.functions.pop(i)
             st.rerun()
 
-    if st.button("Clear All Functions"):
+
+    # Custom 3D Navy Button for Clear All
+    clear_clicked = st.button("🗑️ Clear All Functions", key="clear_all_btn", use_container_width=True)
+    if clear_clicked:
         st.session_state.functions = []
         st.rerun()
+    
+    # Add custom styling for clear button
+    st.markdown("""
+    <style>
+        button[kind="secondary"][data-testid*="clear_all"] {
+            background: linear-gradient(145deg, #1e3a8a, #1e40af) !important;
+            color: white !important;
+            font-weight: 600 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 8px 16px rgba(30, 58, 138, 0.4), 
+                        inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.2) !important;
+            border: none !important;
+        }
+        button[kind="secondary"][data-testid*="clear_all"]:hover {
+            background: linear-gradient(145deg, #2563eb, #3b82f6) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.5) !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
     st.divider()
     
