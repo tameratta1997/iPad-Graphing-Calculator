@@ -559,6 +559,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Render Calculator in Center Column
+with calc_column:
     # Display
     st.markdown(f"""<div class='calc-display'>{st.session_state.calc_expression if st.session_state.calc_expression else "0"}</div>""", unsafe_allow_html=True)
 
