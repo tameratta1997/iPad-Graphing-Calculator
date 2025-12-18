@@ -234,12 +234,12 @@ st.markdown("""
         margin: 0 auto !important;
         
         /* 
-           Crucial Logic for "Perfect Size":
-           - Max Width should never exceed ~600px (tablet size).
-           - But importantly, it should effectively be constrained by height in landscape 
-             to avoid buttons becoming huge ovals.
+           STRICT SIZE CONTROL:
+           Set to 380px (Typical Smartphone Width).
+           This ensures it looks like a real handheld calculator on Desktop,
+           rather than a giant poster.
         */
-        max-width: min(500px, 80vh) !important; 
+        max-width: 380px !important; 
     }
 
     /* ---------------------------------------------------------------------
@@ -247,7 +247,7 @@ st.markdown("""
        --------------------------------------------------------------------- */
     .calc-display {
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        font-size: 4rem; /* Big readable font */
+        font-size: 3rem; /* Reduced from 4rem for better fit */
         background-color: transparent; 
         color: #fff;
         text-align: right;
@@ -270,7 +270,7 @@ st.markdown("""
         align-items: center;
         justify-content: center;
         
-        font-size: 1.8rem !important; /* Responsive font size */
+        font-size: 1.5rem !important; /* Reduced from 1.8rem */
         font-weight: 400 !important;
         
         border: 1px solid rgba(255,255,255,0.05) !important;
