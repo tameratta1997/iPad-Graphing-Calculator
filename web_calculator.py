@@ -377,6 +377,32 @@ st.markdown("""
         padding: 8px 16px !important;
     }
 
+    /* ---------------------------------------------------------------------
+       4. MOBILE OPTIMIZATION (iPhone 12 Pro Max & Smaller)
+       --------------------------------------------------------------------- */
+    @media only screen and (max-width: 600px) {
+        div.stButton > button {
+            aspect-ratio: auto !important;
+            height: 50px !important;
+            min-height: 50px !important;
+            border-radius: 12px !important; /* Rounded rect instead of circle */
+            font-size: 1rem !important;
+            margin: 1px !important;
+        }
+        
+        /* Adjust toggle buttons clearly for mobile */
+        button[key="basic_calc_btn"],
+        button[key="scientific_calc_btn"] {
+            font-size: 0.8rem !important;
+            padding: 4px 8px !important;
+        }
+        
+        .calc-display {
+            font-size: 3rem !important;
+            margin-bottom: 5px !important;
+        }
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
