@@ -205,8 +205,8 @@ st.divider()
 
 st.markdown("""
 <style>
-    /* Calculator Screen Styles */
-    div.stTextInput > div > div > input {
+    /* Display Screen Styles (Custom Div) */
+    .calc-display {
         font-family: 'Courier New', Courier, monospace;
         font-size: 2.5rem;
         background-color: #000000;
@@ -214,46 +214,47 @@ st.markdown("""
         text-align: right;
         border-radius: 10px;
         padding: 15px;
+        margin-bottom: 20px; /* Space between screen and buttons */
         border: 1px solid #333;
+        min-height: 70px;
+        box-shadow: inset 0 0 10px rgba(255,255,255,0.1);
     }
     
-    /* General Button Styles */
+    /* Responsive Calculator Container
+       On Mobile (Portrait): Takes full width naturally.
+       On Desktop/Tablet: Restricts width to simulate a phone/calculator size.
+    */
+    .main .stHorizontalBlock {
+        max-width: 500px;
+        margin: 0 auto !important;
+    }
+    
+    /* Ensure the display matches the button grid width */
+    div[data-testid="stMarkdownContainer"] > div.calc-display {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    /* Button Styles */
     div.stButton > button {
         width: 100%;
-        padding-top: 20px;
-        padding-bottom: 20px;
-        font-size: 20px;
+        aspect-ratio: 1 / 1; /* Make buttons perfectly circular/square-ish */
+        border-radius: 50%;
+        font-size: 22px;
         font-weight: 500;
-        border-radius: 50px; /* Circular / Pill shape */
         border: none;
-        transition: filter 0.2s;
+        margin-bottom: 5px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        transition: transform 0.1s;
     }
     
     div.stButton > button:active {
-        filter: brightness(1.2);
-        transform: scale(0.98);
+        transform: scale(0.95);
     }
 
-    /* Number Buttons (Dark Grey) */
-    div.stButton > button:first-child {
-        background-color: #333333;
-        color: white;
-    }
-
-    /* We can't target specific buttons easily with pure CSS in Streamlit without exact nth-child knowledge 
-       which changes. So we rely on the Python order and inject some specific color overrides via inline styling 
-       hacking or just accept a uniform look with overrides for the special 'Primary' buttons.
-    */
-    
-    /* Override for Primary Buttons (Orange Operators) */
-    div.stButton > button[kind="primary"] {
-        background-color: #ff9f0a !important;
-        color: white !important;
-    }
-    
-    /* Secondary/Function Buttons (Light Grey) - mimicking secondary style if available, 
-       else we stick to dark grey for consistency in this constraint */
+    /* Colors */
+    div.stButton > button { background-color: #333; color: white; }
+    div.stButton > button[kind="primary"] { background-color: #ff9f0a !important; color: white !important; }
 
 </style>
 """, unsafe_allow_html=True)
@@ -285,26 +286,10 @@ def calc_press(val):
     else:
         st.session_state.calc_expression += str(val)
 
-# --- Calculator Container (Simulated Mobile Size) ---
-# We use columns to center and constrain the width
-spacer_left, calc_body, spacer_right = st.columns([1, 2, 1])
+# --- Calculator UI ---
 
-with calc_body:
-    # Display Screen (Custom HTML for proper updates, unlike disabled text_input)
-    st.markdown(f"""
-        <div style='
-            font-family: "Courier New", monospace;
-            font-size: 2.5rem;
-            background-color: #000;
-            color: #fff;
-            text-align: right;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #333;
-            min-height: 70px;
-        '>{st.session_state.calc_expression if st.session_state.calc_expression else "0"}</div>
-    """, unsafe_allow_html=True)
+# Display Screen
+st.markdown(f"""<div class='calc-display'>{st.session_state.calc_expression if st.session_state.calc_expression else "0"}</div>""", unsafe_allow_html=True)
 
     # Define Keyboard Layout
     # [Label, Value, type]
