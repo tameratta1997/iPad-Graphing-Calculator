@@ -414,6 +414,7 @@ st.markdown("""
     /* Operators (Orange) via Primary Type */
     div.stButton > button[kind="primary"] { 
         background-color: #ff9f0a !important; 
+        color: black !important; /* Black text for operators */
     }
     
     /* Active State */
