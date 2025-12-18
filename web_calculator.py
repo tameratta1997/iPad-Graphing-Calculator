@@ -119,8 +119,13 @@ with st.sidebar:
 # -----------------------------------------------------------------------------
 # Main Area - Title and Graph
 # -----------------------------------------------------------------------------
-st.title("🧮 Graphing Calculator Pro")
-st.write("A professional graphing tool for iPad, Mobile, and Desktop.")
+# Professional Header with Photo
+col1, col2 = st.columns([1, 5])
+with col1:
+    st.image("tamer_photo.jpg", width=120)
+with col2:
+    st.title("🧮 Graphing Calculator Pro")
+    st.write("A professional graphing tool for iPad, Mobile, and Desktop.")
 
 if not st.session_state.functions:
     st.info("👈 Add a function in the sidebar to start graphing!")
@@ -445,7 +450,7 @@ buttons = [
     ("EE", "*10^", ""), ("1", "1", "light"), ("2", "2", "light"), ("3", "3", "light"), ("+", "+", "primary"),
     # Row 5
     ("Rad", "", ""), ("sinh", "sinh(", ""), ("cosh", "cosh(", ""), ("tanh", "tanh(", ""), ("π", "π", ""), 
-    ("Rand", "Rand", ""), ("0", "0", "light"), ("00", "00", "light"), (".", ".", "light"), ("=", "=", "primary"),
+    ("Rand", "Rand", ""), ("0", "0", "light"), (".", ".", "light"), ("+/-", "+/-", "light"), ("=", "=", "primary"),
 ]
 
 # Render 10-column Grid
@@ -470,5 +475,5 @@ st.markdown("""
 3. Select **"Add to Home Screen"**.
 4. Now it works like a real app!
 ---
-✨ **Developed By Tamer Elwakeel** | *Python Diploma 2024*
+✨ **Developed By Tamer Elwakeel** | *Python Diploma 2025*
 """)
