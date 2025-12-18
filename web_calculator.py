@@ -204,6 +204,10 @@ else:
     x = np.linspace(x_min, x_max, 1000)
     colors = ['#00ff00', '#ff00ff', '#00ffff', '#ffff00', '#ff8800']
     
+    # --- Draw Fixed X and Y Axes ---
+    ax.axhline(y=0, color='white', linewidth=1.5, alpha=0.8, zorder=1)  # X-axis (horizontal line at y=0)
+    ax.axvline(x=0, color='white', linewidth=1.5, alpha=0.8, zorder=1)  # Y-axis (vertical line at x=0)
+    
     all_y = []
     
     # --- Plot Functions ---
