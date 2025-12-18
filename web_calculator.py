@@ -350,33 +350,49 @@ def calc_press(val):
     # Execution
     elif val == "=":
         try:
-            # Replace visual symbols with python syntax
+            import re
+            import random
+            
+            # Start with the expression
             valid_expr = expr
-            replacements = {
-                '×': '*', '÷': '/', '^': '**', 'π': 'math.pi', 'e': 'math.e',
-                'sin': 'math.sin', 'cos': 'math.cos', 'tan': 'math.tan',
-                'asin': 'math.asin', 'acos': 'math.acos', 'atan': 'math.atan',
+            
+            # Basic symbol replacements
+            valid_expr = valid_expr.replace('×', '*').replace('÷', '/')
+            valid_expr = valid_expr.replace('^', '**')
+            valid_expr = valid_expr.replace('²', '**2').replace('³', '**3')
+            valid_expr = valid_expr.replace('π', 'math.pi').replace('e', 'math.e')
+            
+            # Handle trig functions based on angle mode
+            if st.session_state.angle_mode == "Deg":
+                # For normal trig (input in degrees)
+                for trig in ['sin', 'cos', 'tan']:
+                    # Match trig(content) where content doesn't contain parens (simple cases)
+                    pattern = rf'\b{trig}\(([^()]+)\)'
+                    replacement = rf'math.{trig}(math.radians(\1))'
+                    valid_expr = re.sub(pattern, replacement, valid_expr)
+                
+                # For inverse trig (output in degrees)
+                for trig in ['asin', 'acos', 'atan']:
+                    pattern = rf'\b{trig}\(([^()]+)\)'
+                    replacement = rf'math.degrees(math.{trig}(\1))'
+                    valid_expr = re.sub(pattern, replacement, valid_expr)
+            else:
+                # Radians mode - just add math. prefix
+                for trig in ['sin', 'cos', 'tan', 'asin', 'acos', 'atan']:
+                    pattern = rf'\b{trig}\('
+                    replacement = f'math.{trig}('
+                    valid_expr = re.sub(pattern, replacement, valid_expr)
+            
+            # Handle other functions
+            other_replacements = {
                 'sinh': 'math.sinh', 'cosh': 'math.cosh', 'tanh': 'math.tanh',
                 'ln': 'math.log', 'log₁₀': 'math.log10', '√': 'math.sqrt',
-                '!': 'math.factorial', 'Rand': 'random.random()',
-                '²': '**2', '³': '**3'
+                '!': 'math.factorial', 'Rand': 'random.random()'
             }
-            
-            # Handle degree mode conversions
-            if st.session_state.angle_mode == "Deg":
-                # Convert degree trig functions to wrap with radians conversion
-                for trig in ['sin', 'cos', 'tan']:
-                    valid_expr = valid_expr.replace(f'{trig}(', f'math.{trig}(math.radians(')
-                # Add closing parens for radians conversion (simple approach)
-                valid_expr = valid_expr.replace(')', '))')
-            
-            # Handle special cases like percentages or just replace strings
-            # Simple replace approach for MVP scientific calc
-            for k, v in replacements.items():
+            for k, v in other_replacements.items():
                 valid_expr = valid_expr.replace(k, v)
-                
-            # Safe eval context
-            import random
+            
+            # Evaluate
             context = {"math": math, "abs": abs, "random": random}
             res = eval(valid_expr, {"__builtins__": None}, context)
             
