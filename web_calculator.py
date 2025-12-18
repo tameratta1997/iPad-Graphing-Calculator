@@ -464,7 +464,8 @@ for row in range(5):
             # (Note: Streamlit doesn't support a 3rd color type natively without component tricks, 
             # so we stick to Dark/Orange to ensure stability)
             key_type = "primary" if kind == "primary" else "secondary"
-            c.button(label, on_click=calc_press, args=(val,), type=key_type, use_container_width=True)
+            # Add unique key to avoid duplicate IDs
+            c.button(label, on_click=calc_press, args=(val,), type=key_type, use_container_width=True, key=f"calc_btn_{idx}")
             idx += 1
 
 st.markdown("""
