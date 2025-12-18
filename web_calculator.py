@@ -310,60 +310,157 @@ st.subheader(" Calculator")
 # Logic
 if "calc_expression" not in st.session_state:
     st.session_state.calc_expression = ""
+if "memory" not in st.session_state:
+    st.session_state.memory = 0.0
 
 def calc_press(val):
-    if val == "C":
+    expr = st.session_state.calc_expression
+    
+    # Clear & Memory
+    if val == "AC":
         st.session_state.calc_expression = ""
+    elif val == "⌫":
+        st.session_state.calc_expression = expr[:-1]
+    elif val == "mc":
+        st.session_state.memory = 0.0
+    elif val == "m+":
+        try: st.session_state.memory += float(eval(expr))
+        except: pass
+    elif val == "m-":
+        try: st.session_state.memory -= float(eval(expr))
+        except: pass
+    elif val == "mr":
+        st.session_state.calc_expression += str(st.session_state.memory)
+        
+    # Execution
     elif val == "=":
         try:
-            expr = st.session_state.calc_expression
-            expr = expr.replace('×', '*').replace('÷', '/')
-            expr = expr.replace('^', '**').replace('π', 'math.pi')
-            expr = expr.replace('sin', 'math.sin').replace('cos', 'math.cos')
-            expr = expr.replace('tan', 'math.tan').replace('√', 'math.sqrt')
-            res = eval(expr, {"__builtins__": None}, {"math": math, "abs": abs})
+            # Replace visual symbols with python syntax
+            valid_expr = expr
+            replacements = {
+                '×': '*', '÷': '/', '^': '**', 'π': 'math.pi', 'e': 'math.e',
+                'sin': 'math.sin', 'cos': 'math.cos', 'tan': 'math.tan',
+                'sinh': 'math.sinh', 'cosh': 'math.cosh', 'tanh': 'math.tanh',
+                'ln': 'math.log', 'log₁₀': 'math.log10', '√': 'math.sqrt',
+                '!': 'math.factorial', 'Rand': 'random.random()',
+                '²': '**2', '³': '**3'
+            }
+            # Handle special cases like percentages or just replace strings
+            # Simple replace approach for MVP scientific calc
+            for k, v in replacements.items():
+                valid_expr = valid_expr.replace(k, v)
+                
+            # Safe eval context
+            import random
+            context = {"math": math, "abs": abs, "random": random}
+            res = eval(valid_expr, {"__builtins__": None}, context)
+            
             if isinstance(res, float) and res.is_integer():
                 res = int(res)
             st.session_state.calc_expression = str(res)
         except:
             st.session_state.calc_expression = "Error"
-    elif val == "⌫":
-        st.session_state.calc_expression = st.session_state.calc_expression[:-1]
+            
+    # Standard Input
     else:
         st.session_state.calc_expression += str(val)
 
-# --- Calculator UI ---
+# --- Wide Landscape Layout CSS ---
+st.markdown("""
+<style>
+    /* 1. CONTAINER: Wide Landscape Logic */
+    .main .block-container {
+        max-width: 1000px !important; /* Allow wide calculator */
+        padding-top: 1rem !important;
+        padding-bottom: 2rem !important;
+    }
+    
+    div[data-testid="stVerticalBlock"] > div[style*="flex-direction: column;"] > div[data-testid="stVerticalBlock"] {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
 
-# Display Screen
+    /* 2. DISPLAY SCREEN */
+    .calc-display {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 3.5rem;
+        background-color: transparent; 
+        color: #fff;
+        text-align: right;
+        border: none;
+        margin-bottom: 10px;
+        padding-right: 15px;
+    }
+
+    /* 3. BUTTONS (10 Columns) */
+    div.stButton > button {
+        width: 100% !important;
+        aspect-ratio: 1.2 / 1 !important; /* Slightly oval for landscape density */
+        border-radius: 40% !important;
+        font-size: 1.1rem !important;
+        font-weight: 400 !important;
+        border: none !important;
+        margin: 2px !important;
+        padding: 0 !important;
+        background-color: #333; /* Dark Grey (Scientific) Default */
+        color: white !important;
+    }
+
+    /* Operators (Orange) via Primary Type */
+    div.stButton > button[kind="primary"] { 
+        background-color: #ff9f0a !important; 
+    }
+    
+    /* Active State */
+    div.stButton > button:active {
+        filter: brightness(1.3);
+        transform: scale(0.95);
+    }
+    
+    header, footer { visibility: hidden; }
+
+</style>
+""", unsafe_allow_html=True)
+
+st.subheader(" Scientific Calculator")
+
+# Display
 st.markdown(f"""<div class='calc-display'>{st.session_state.calc_expression if st.session_state.calc_expression else "0"}</div>""", unsafe_allow_html=True)
 
-# Define Keyboard Layout
-# [Label, Value, type]
+# 10x5 Scientific Grid
+# [Label, Value, Kind]
+# Kind: 'default' (dark grey), 'light' (lighter grey - handled by CSS hack or just ignored for MVP), 'primary' (orange)
 buttons = [
-    ("sin", "sin(", "default"), ("cos", "cos(", "default"), ("tan", "tan(", "default"), ("C", "C", "primary"),
-    ("√", "sqrt(", "default"),  ("^", "^", "default"),      ("π", "pi", "default"),     ("⌫", "⌫", "primary"),
-    ("7", "7", "default"),      ("8", "8", "default"),      ("9", "9", "default"),      ("÷", "÷", "primary"),
-    ("4", "4", "default"),      ("5", "5", "default"),      ("6", "6", "default"),      ("×", "×", "primary"),
-    ("1", "1", "default"),      ("2", "2", "default"),      ("3", "3", "default"),      ("−", "-", "primary"),
-    ("0", "0", "default"),      (".", ".", "default"),      ("(", "(", "default"),      ("+", "+", "primary"),
-    (")", ")", "default"),      ("", "", "default"),        ("", "", "default"),        ("=", "=", "primary"),
+    # Row 1
+    ("(", "(", ""), (")", ")", ""), ("mc", "mc", ""), ("m+", "m+", ""), ("m-", "m-", ""), 
+    ("mr", "mr", ""), ("AC", "AC", "light"), ("+/-", "-", "light"), ("%", "/100", "light"), ("÷", "÷", "primary"),
+    # Row 2
+    ("2ⁿᵈ", "", ""), ("x²", "²", ""), ("x³", "³", ""), ("xʸ", "^", ""), ("eˣ", "e^", ""), 
+    ("10ˣ", "10^", ""), ("7", "7", "light"), ("8", "8", "light"), ("9", "9", "light"), ("×", "×", "primary"),
+    # Row 3
+    ("¹/x", "**-1", ""), ("²√x", "√(", ""), ("³√x", "**(1/3)", ""), ("ʸ√x", "**(1/", ""), ("ln", "ln(", ""), 
+    ("log₁₀", "log₁₀(", ""), ("4", "4", "light"), ("5", "5", "light"), ("6", "6", "light"), ("−", "-", "primary"),
+    # Row 4
+    ("x!", "!", ""), ("sin", "sin(", ""), ("cos", "cos(", ""), ("tan", "tan(", ""), ("e", "e", ""), 
+    ("EE", "*10^", ""), ("1", "1", "light"), ("2", "2", "light"), ("3", "3", "light"), ("+", "+", "primary"),
+    # Row 5
+    ("Rad", "", ""), ("sinh", "sinh(", ""), ("cosh", "cosh(", ""), ("tanh", "tanh(", ""), ("π", "π", ""), 
+    ("Rand", "Rand", ""), ("0", "0", "light"), ("00", "00", "light"), (".", ".", "light"), ("=", "=", "primary"),
 ]
 
-# Render Grid
+# Render 10-column Grid
 idx = 0
-for row in range(7):
-        # Nested columns for the button grid
-        cols = st.columns(4, gap="small")
-        for c in cols:
-            if idx < len(buttons):
-                label, val, kind = buttons[idx]
-                if label:
-                    # We use the type='primary' to trigger the orange CSS we wrote above
-                    if kind == 'primary':
-                        c.button(label, on_click=calc_press, args=(val,), type="primary", use_container_width=True)
-                    else:
-                        c.button(label, on_click=calc_press, args=(val,), use_container_width=True)
-                idx += 1
+for row in range(5):
+    cols = st.columns(10, gap="small")
+    for c in cols:
+        if idx < len(buttons):
+            label, val, kind = buttons[idx]
+            # Use primary type for orange buttons, default for others
+            # (Note: Streamlit doesn't support a 3rd color type natively without component tricks, 
+            # so we stick to Dark/Orange to ensure stability)
+            key_type = "primary" if kind == "primary" else "secondary"
+            c.button(label, on_click=calc_press, args=(val,), type=key_type, use_container_width=True)
+            idx += 1
 
 st.markdown("""
 ---
