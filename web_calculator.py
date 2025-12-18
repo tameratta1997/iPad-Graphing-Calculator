@@ -291,21 +291,21 @@ def calc_press(val):
 # Display Screen
 st.markdown(f"""<div class='calc-display'>{st.session_state.calc_expression if st.session_state.calc_expression else "0"}</div>""", unsafe_allow_html=True)
 
-    # Define Keyboard Layout
-    # [Label, Value, type]
-    buttons = [
-        ("sin", "sin(", "default"), ("cos", "cos(", "default"), ("tan", "tan(", "default"), ("C", "C", "primary"),
-        ("√", "sqrt(", "default"),  ("^", "^", "default"),      ("π", "pi", "default"),     ("⌫", "⌫", "primary"),
-        ("7", "7", "default"),      ("8", "8", "default"),      ("9", "9", "default"),      ("÷", "÷", "primary"),
-        ("4", "4", "default"),      ("5", "5", "default"),      ("6", "6", "default"),      ("×", "×", "primary"),
-        ("1", "1", "default"),      ("2", "2", "default"),      ("3", "3", "default"),      ("−", "-", "primary"),
-        ("0", "0", "default"),      (".", ".", "default"),      ("(", "(", "default"),      ("+", "+", "primary"),
-        (")", ")", "default"),      ("", "", "default"),        ("", "", "default"),        ("=", "=", "primary"),
-    ]
+# Define Keyboard Layout
+# [Label, Value, type]
+buttons = [
+    ("sin", "sin(", "default"), ("cos", "cos(", "default"), ("tan", "tan(", "default"), ("C", "C", "primary"),
+    ("√", "sqrt(", "default"),  ("^", "^", "default"),      ("π", "pi", "default"),     ("⌫", "⌫", "primary"),
+    ("7", "7", "default"),      ("8", "8", "default"),      ("9", "9", "default"),      ("÷", "÷", "primary"),
+    ("4", "4", "default"),      ("5", "5", "default"),      ("6", "6", "default"),      ("×", "×", "primary"),
+    ("1", "1", "default"),      ("2", "2", "default"),      ("3", "3", "default"),      ("−", "-", "primary"),
+    ("0", "0", "default"),      (".", ".", "default"),      ("(", "(", "default"),      ("+", "+", "primary"),
+    (")", ")", "default"),      ("", "", "default"),        ("", "", "default"),        ("=", "=", "primary"),
+]
 
-    # Render Grid
-    idx = 0
-    for row in range(7):
+# Render Grid
+idx = 0
+for row in range(7):
         # Nested columns for the button grid
         cols = st.columns(4, gap="small")
         for c in cols:
