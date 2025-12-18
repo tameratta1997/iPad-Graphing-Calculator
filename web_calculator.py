@@ -378,39 +378,42 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------
-       4. MOBILE OPTIMIZATION SEVERE OVERRIDE (iPhone 12 Pro Max & Smaller)
+       4. MOBILE OPTIMIZATION: MARKER HACK (iPhone 12 Pro Max & Smaller)
        --------------------------------------------------------------------- */
     @media only screen and (max-width: 600px) {
         
-        /* FORCE COLUMNS TO STAY SIDE-BY-SIDE */
-        /* Target the vertical block that wraps the columns and force it to be horizontal */
-        div[data-testid="stHorizontalBlock"] {
+        /* 
+           Target the horizontal block immediately following our marker container.
+           Using :has() to find the wrapper of the marker.
+        */
+        div:has(.mobile-row-fix) + div[data-testid="stHorizontalBlock"] {
             flex-direction: row !important;
             flex-wrap: nowrap !important;
         }
 
-        /* This targets the columns inside the calculator grid */
-        div[data-testid="column"] {
+        /* Target the columns inside that specific horizontal block */
+        div:has(.mobile-row-fix) + div [data-testid="column"] {
             width: auto !important;
             flex: 1 1 auto !important;
             min-width: 0px !important;
         }
-
-        /* 
-           Specific targeting for Basic (4 cols) vs Scientific (10 cols) 
-           We use the fact that they are inside the main area.
-           This is a bit broader but necessary.
-        */
         
-        /* Force buttons to be small */
+        /* Hide the marker container to prevent extra spacing */
+        div:has(.mobile-row-fix) {
+            height: 0px !important;
+            margin: 0px !important;
+            overflow: hidden !important;
+        }
+
+        /* Force buttons to be small and fit */
         div.stButton > button {
-            height: 50px !important;
-            min-height: 50px !important;
+            height: 45px !important;
+            min-height: 45px !important;
             padding: 0 !important;
-            font-size: 0.9rem !important;
+            font-size: 0.8rem !important; /* Smaller font */
             border-radius: 8px !important;
             margin: 2px !important;
-            aspect-ratio: auto !important; /* Allow shape change */
+            aspect-ratio: auto !important; 
         }
 
         /* Adjust display size */
@@ -422,10 +425,10 @@ st.markdown("""
         /* Toggle buttons */
         button[key="basic_calc_btn"],
         button[key="scientific_calc_btn"] {
-            font-size: 0.8rem !important;
-            padding: 4px 8px !important;
             height: 35px !important;
             min-height: 35px !important;
+            font-size: 0.8rem !important;
+            padding: 4px 8px !important;
         }
     }
 
@@ -637,6 +640,7 @@ with calc_column:
         # Render 4-column basic grid
         idx = 0
         for row in range(5):
+            st.markdown('<div class="mobile-row-fix"></div>', unsafe_allow_html=True)
             cols = st.columns(4, gap="small")
             for c in cols:
                 if idx < len(basic_buttons):
@@ -676,6 +680,7 @@ with calc_column:
         # Render 10-column Grid
         idx = 0
         for row in range(5):
+            st.markdown('<div class="mobile-row-fix"></div>', unsafe_allow_html=True)
             cols = st.columns(10, gap="small")
             for c in cols:
                 if idx < len(buttons):
