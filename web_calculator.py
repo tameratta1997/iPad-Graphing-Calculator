@@ -380,8 +380,41 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Calculator mode toggle buttons
-col1, col2 = st.columns(2)
+# Wrap entire calculator in a compact container
+st.markdown("""
+<style>
+    .calculator-wrapper {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .mode-toggle-container {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    .mode-toggle-btn {
+        padding: 8px 20px;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        border: 2px solid #90EE90;
+        background: #2d2d2d;
+        color: white;
+        cursor: pointer;
+        min-width: 120px;
+        text-align: center;
+    }
+    .mode-toggle-btn:hover {
+        background: #90EE90;
+        color: black;
+    }
+</style>
+<div class="calculator-wrapper">
+""", unsafe_allow_html=True)
+
+# Calculator mode toggle buttons - using columns but constrained
+col_spacer1, col1, col2, col_spacer2 = st.columns([1, 1, 1, 1])
 with col1:
     if st.button("🍏 Basic", key="basic_calc_btn", use_container_width=True):
         st.session_state.calculator_mode = "basic"
@@ -393,7 +426,7 @@ with col2:
 
 # Display current mode
 mode_name = "Basic Calculator" if st.session_state.get("calculator_mode", "scientific") == "basic" else "Scientific Calculator"
-st.markdown(f"<h3 style='text-align: center; color: #90EE90;'>{mode_name}</h3>", unsafe_allow_html=True)
+st.markdown(f"<h4 style='text-align: center; color: #90EE90; margin-top: 5px; margin-bottom: 15px;'>{mode_name}</h4>", unsafe_allow_html=True)
 
 # Logic
 if "calc_expression" not in st.session_state:
@@ -546,7 +579,7 @@ st.markdown("""
     
     /* BASIC CALCULATOR - Constrain width */
     .basic-calculator-container {
-        max-width: 400px;
+        max-width: 350px;
         margin: 0 auto;
     }
     
@@ -639,6 +672,9 @@ else:  # scientific mode
                     else:
                         c.button(label, on_click=calc_press, args=(val,), type=key_type, use_container_width=True, key=f"calc_btn_{idx}")
                 idx += 1
+
+# Close calculator wrapper
+st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("""
 ---
