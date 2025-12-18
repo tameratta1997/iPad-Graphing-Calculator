@@ -205,56 +205,102 @@ st.divider()
 
 st.markdown("""
 <style>
-    /* Display Screen Styles (Custom Div) */
+    /* ---------------------------------------------------------------------
+       1. LAYOUT CONTAINER (The "Phone" Box)
+       --------------------------------------------------------------------- */
+    
+    /* 
+       Target the main block containing the calculator.
+       We want it to act like a mobile phone screen regardless of the device.
+       
+       LANDSCAPE MODE (Desktop/iPad Horizontal):
+       The limiting factor is Height. We set width relative to height (e.g., 60% of height).
+       
+       PORTRAIT MODE (Phone/iPad Vertical):
+       The limiting factor is Width. We set width to almost 100%.
+    */
+    
+    .main .block-container {
+        max-width: 100% !important;
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+        padding-left: 1rem !important; 
+        padding-right: 1rem !important;
+    }
+
+    /* We wrap the calculator content in a specific width-constrained block via CSS on the Streamlit grid */
+    div[data-testid="stVerticalBlock"] > div[style*="flex-direction: column;"] > div[data-testid="stVerticalBlock"] {
+        width: 100% !important;
+        margin: 0 auto !important;
+        
+        /* 
+           Crucial Logic for "Perfect Size":
+           - Max Width should never exceed ~600px (tablet size).
+           - But importantly, it should effectively be constrained by height in landscape 
+             to avoid buttons becoming huge ovals.
+        */
+        max-width: min(500px, 80vh) !important; 
+    }
+
+    /* ---------------------------------------------------------------------
+       2. DISPLAY SCREEN
+       --------------------------------------------------------------------- */
     .calc-display {
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 2.5rem;
-        background-color: #000000;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 4rem; /* Big readable font */
+        background-color: transparent; 
         color: #fff;
         text-align: right;
-        border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 20px; /* Space between screen and buttons */
-        border: 1px solid #333;
-        min-height: 70px;
-        box-shadow: inset 0 0 10px rgba(255,255,255,0.1);
-    }
-    
-    /* Responsive Calculator Container
-       On Mobile (Portrait): Takes full width naturally.
-       On Desktop/Tablet: Restricts width to simulate a phone/calculator size.
-    */
-    .main .stHorizontalBlock {
-        max-width: 500px;
-        margin: 0 auto !important;
-    }
-    
-    /* Ensure the display matches the button grid width */
-    div[data-testid="stMarkdownContainer"] > div.calc-display {
-        max-width: 500px;
-        margin: 0 auto;
+        border: none;
+        margin-bottom: 0px;
+        padding-right: 10px;
+        line-height: 1.2;
     }
 
-    /* Button Styles */
+    /* ---------------------------------------------------------------------
+       3. ROUND BUTTONS
+       --------------------------------------------------------------------- */
     div.stButton > button {
-        width: 100%;
-        aspect-ratio: 1 / 1; /* Make buttons perfectly circular/square-ish */
-        border-radius: 50%;
-        font-size: 22px;
-        font-weight: 500;
-        border: none;
-        margin-bottom: 5px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        transition: transform 0.1s;
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1 !important; /* FORCES CIRCLE SHAPE */
+        border-radius: 50% !important;
+        
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        font-size: 1.8rem !important; /* Responsive font size */
+        font-weight: 400 !important;
+        
+        border: 1px solid rgba(255,255,255,0.05) !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-shadow: none !important;
     }
     
+    /* Button Colors */
+    /* Numbers (Dark Grey) */
+    div.stButton > button { 
+        background-color: #333333 !important; 
+        color: white !important; 
+    }
+    
+    /* Operators (Orange) */
+    div.stButton > button[kind="primary"] { 
+        background-color: #ff9f0a !important; 
+        color: white !important; 
+    }
+    
+    /* Active State (Tap effect) */
     div.stButton > button:active {
+        filter: brightness(1.3);
         transform: scale(0.95);
     }
-
-    /* Colors */
-    div.stButton > button { background-color: #333; color: white; }
-    div.stButton > button[kind="primary"] { background-color: #ff9f0a !important; color: white !important; }
+    
+    /* Hide the default streamlit top padding to make it look like an app */
+    header { visibility: hidden; }
+    footer { visibility: hidden; }
 
 </style>
 """, unsafe_allow_html=True)
