@@ -371,7 +371,16 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.subheader(" Calculator")
+# Calculator mode toggle buttons
+col1, col2 = st.columns(2)
+with col1:
+    if st.button("🍏 Basic Calculator", key="basic_calc_btn", use_container_width=True):
+        st.session_state.calculator_mode = "basic"
+        st.rerun()
+with col2:
+    if st.button("🍏 Scientific Calculator", key="scientific_calc_btn", use_container_width=True):
+        st.session_state.calculator_mode = "scientific"
+        st.rerun()
 
 # Logic
 if "calc_expression" not in st.session_state:
