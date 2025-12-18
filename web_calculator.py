@@ -378,28 +378,48 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------
-       4. MOBILE OPTIMIZATION (iPhone 12 Pro Max & Smaller)
+       4. MOBILE OPTIMIZATION SEVERE OVERRIDE (iPhone 12 Pro Max & Smaller)
        --------------------------------------------------------------------- */
     @media only screen and (max-width: 600px) {
+        
+        /* FORCE COLUMNS TO STAY SIDE-BY-SIDE */
+        /* This targets the columns inside the calculator grid */
+        div[data-testid="column"] {
+            width: auto !important;
+            flex: 1 1 auto !important;
+            min-width: 0px !important;
+        }
+
+        /* 
+           Specific targeting for Basic (4 cols) vs Scientific (10 cols) 
+           We use the fact that they are inside the main area.
+           This is a bit broader but necessary.
+        */
+        
+        /* Force buttons to be small */
         div.stButton > button {
-            aspect-ratio: auto !important;
             height: 50px !important;
             min-height: 50px !important;
-            border-radius: 12px !important; /* Rounded rect instead of circle */
-            font-size: 1rem !important;
-            margin: 1px !important;
+            padding: 0 !important;
+            font-size: 0.9rem !important;
+            border-radius: 8px !important;
+            margin: 2px !important;
+            aspect-ratio: auto !important; /* Allow shape change */
+        }
+
+        /* Adjust display size */
+        .calc-display {
+            font-size: 2.5rem !important;
+            margin-bottom: 5px !important;
         }
         
-        /* Adjust toggle buttons clearly for mobile */
+        /* Toggle buttons */
         button[key="basic_calc_btn"],
         button[key="scientific_calc_btn"] {
             font-size: 0.8rem !important;
             padding: 4px 8px !important;
-        }
-        
-        .calc-display {
-            font-size: 3rem !important;
-            margin-bottom: 5px !important;
+            height: 35px !important;
+            min-height: 35px !important;
         }
     }
 
