@@ -196,19 +196,88 @@ else:
     st.pyplot(fig)
 
 # -----------------------------------------------------------------------------
-# Simple Calculator Tab
+# Interactive Calculator GUI
 # -----------------------------------------------------------------------------
 st.divider()
-st.subheader("🔢 Quick Basic Calculator")
-col1, col2 = st.columns([3, 1])
-calc_input = col1.text_input("Enter expression:", value="15 * (2 + 3)")
-if col2.button("Calculate"):
+st.subheader("🔢 Calculator")
+
+# Initialize session state for the calculator display
+if "calc_expression" not in st.session_state:
+    st.session_state.calc_expression = ""
+
+def update_expr(val):
+    st.session_state.calc_expression += str(val)
+
+def clear_expr():
+    st.session_state.calc_expression = ""
+
+def backspace_expr():
+    st.session_state.calc_expression = st.session_state.calc_expression[:-1]
+
+def evaluate_expr():
     try:
-        # Use your custom calculator logic here if needed
-        result = eval(calc_input)
-        st.success(f"Result: {result}")
-    except Exception as e:
-        st.error(f"Error: {e}")
+        # Support for caret power operator and common math functions
+        expr = st.session_state.calc_expression
+        expr = expr.replace('^', '**').replace('sqrt', 'math.sqrt')
+        expr = expr.replace('sin', 'math.sin').replace('cos', 'math.cos')
+        expr = expr.replace('tan', 'math.tan').replace('pi', 'math.pi')
+        
+        # Evaluate safely
+        result = eval(expr, {"__builtins__": None}, {"math": math, "abs": abs, "round": round})
+        
+        # round if result is a float mostly integral
+        if isinstance(result, float) and result.is_integer():
+            result = int(result)
+        
+        st.session_state.calc_expression = str(result)
+    except Exception:
+        st.session_state.calc_expression = "Error"
+
+# Display Screen
+st.text_input("Display", key="calc_expression", label_visibility="collapsed")
+
+# Button Grid Layout (Touch-friendly for iPad)
+# Row 1: Scientific
+c1, c2, c3, c4 = st.columns(4)
+c1.button("sin", on_click=update_expr, args=("sin(",))
+c2.button("cos", on_click=update_expr, args=("cos(",))
+c3.button("tan", on_click=update_expr, args=("tan(",))
+c4.button("sqrt", on_click=update_expr, args=("sqrt(",))
+
+# Row 2: Brackets & Power
+c1, c2, c3, c4 = st.columns(4)
+c1.button("(", on_click=update_expr, args=("(",))
+c2.button(")", on_click=update_expr, args=(")",))
+c3.button("^", on_click=update_expr, args=("^",))
+c4.button("C", on_click=clear_expr) # Clear
+
+# Row 3: 7-9 & Division
+c1, c2, c3, c4 = st.columns(4)
+c1.button("7", on_click=update_expr, args=("7",))
+c2.button("8", on_click=update_expr, args=("8",))
+c3.button("9", on_click=update_expr, args=("9",))
+c4.button("÷", on_click=update_expr, args=("/",))
+
+# Row 4: 4-6 & Multiplication
+c1, c2, c3, c4 = st.columns(4)
+c1.button("4", on_click=update_expr, args=("4",))
+c2.button("5", on_click=update_expr, args=("5",))
+c3.button("6", on_click=update_expr, args=("6",))
+c4.button("×", on_click=update_expr, args=("*",))
+
+# Row 5: 1-3 & Subtraction
+c1, c2, c3, c4 = st.columns(4)
+c1.button("1", on_click=update_expr, args=("1",))
+c2.button("2", on_click=update_expr, args=("2",))
+c3.button("3", on_click=update_expr, args=("3",))
+c4.button("−", on_click=update_expr, args=("-",))
+
+# Row 6: 0, Dot, Equal, Addition
+c1, c2, c3, c4 = st.columns(4)
+c1.button("0", on_click=update_expr, args=("0",))
+c2.button(".", on_click=update_expr, args=(".",))
+c3.button("=", on_click=evaluate_expr, type="primary") # Primary color for equals
+c4.button("+", on_click=update_expr, args=("+",))
 
 st.markdown("""
 ---
