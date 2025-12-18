@@ -317,6 +317,16 @@ if "calc_expression" not in st.session_state:
     st.session_state.calc_expression = ""
 if "memory" not in st.session_state:
     st.session_state.memory = 0.0
+if "second_mode" not in st.session_state:
+    st.session_state.second_mode = False  # Toggle for inverse trig functions
+if "angle_mode" not in st.session_state:
+    st.session_state.angle_mode = "Rad"  # "Rad" or "Deg"
+
+def toggle_second_mode():
+    st.session_state.second_mode = not st.session_state.second_mode
+
+def toggle_angle_mode():
+    st.session_state.angle_mode = "Deg" if st.session_state.angle_mode == "Rad" else "Rad"
 
 def calc_press(val):
     expr = st.session_state.calc_expression
@@ -345,11 +355,21 @@ def calc_press(val):
             replacements = {
                 '×': '*', '÷': '/', '^': '**', 'π': 'math.pi', 'e': 'math.e',
                 'sin': 'math.sin', 'cos': 'math.cos', 'tan': 'math.tan',
+                'asin': 'math.asin', 'acos': 'math.acos', 'atan': 'math.atan',
                 'sinh': 'math.sinh', 'cosh': 'math.cosh', 'tanh': 'math.tanh',
                 'ln': 'math.log', 'log₁₀': 'math.log10', '√': 'math.sqrt',
                 '!': 'math.factorial', 'Rand': 'random.random()',
                 '²': '**2', '³': '**3'
             }
+            
+            # Handle degree mode conversions
+            if st.session_state.angle_mode == "Deg":
+                # Convert degree trig functions to wrap with radians conversion
+                for trig in ['sin', 'cos', 'tan']:
+                    valid_expr = valid_expr.replace(f'{trig}(', f'math.{trig}(math.radians(')
+                # Add closing parens for radians conversion (simple approach)
+                valid_expr = valid_expr.replace(')', '))')
+            
             # Handle special cases like percentages or just replace strings
             # Simple replace approach for MVP scientific calc
             for k, v in replacements.items():
@@ -436,21 +456,30 @@ st.markdown(f"""<div class='calc-display'>{st.session_state.calc_expression if s
 # 10x5 Scientific Grid
 # [Label, Value, Kind]
 # Kind: 'default' (dark grey), 'light' (lighter grey - handled by CSS hack or just ignored for MVP), 'primary' (orange)
+
+# Dynamic button labels based on mode
+sin_label = "asin" if st.session_state.second_mode else "sin"
+cos_label = "acos" if st.session_state.second_mode else "cos"
+tan_label = "atan" if st.session_state.second_mode else "tan"
+sin_val = "asin(" if st.session_state.second_mode else "sin("
+cos_val = "acos(" if st.session_state.second_mode else "cos("
+tan_val = "atan(" if st.session_state.second_mode else "tan("
+
 buttons = [
     # Row 1
     ("(", "(", ""), (")", ")", ""), ("mc", "mc", ""), ("m+", "m+", ""), ("m-", "m-", ""), 
     ("mr", "mr", ""), ("AC", "AC", "light"), ("+/-", "-", "light"), ("%", "/100", "light"), ("÷", "÷", "primary"),
     # Row 2
-    ("2ⁿᵈ", "", ""), ("x²", "²", ""), ("x³", "³", ""), ("xʸ", "^", ""), ("eˣ", "e^", ""), 
+    ("2ⁿᵈ", "2nd", ""), ("x²", "²", ""), ("x³", "³", ""), ("xʸ", "^", ""), ("eˣ", "e^", ""), 
     ("10ˣ", "10^", ""), ("7", "7", "light"), ("8", "8", "light"), ("9", "9", "light"), ("×", "×", "primary"),
     # Row 3
     ("¹/x", "**-1", ""), ("²√x", "√(", ""), ("³√x", "**(1/3)", ""), ("ʸ√x", "**(1/", ""), ("ln", "ln(", ""), 
     ("log₁₀", "log₁₀(", ""), ("4", "4", "light"), ("5", "5", "light"), ("6", "6", "light"), ("−", "-", "primary"),
-    # Row 4
-    ("x!", "!", ""), ("sin", "sin(", ""), ("cos", "cos(", ""), ("tan", "tan(", ""), ("e", "e", ""), 
+    # Row 4 - Dynamic trig labels
+    ("x!", "!", ""), (sin_label, sin_val, ""), (cos_label, cos_val, ""), (tan_label, tan_val, ""), ("e", "e", ""), 
     ("EE", "*10^", ""), ("1", "1", "light"), ("2", "2", "light"), ("3", "3", "light"), ("+", "+", "primary"),
-    # Row 5
-    ("Rad", "", ""), ("sinh", "sinh(", ""), ("cosh", "cosh(", ""), ("tanh", "tanh(", ""), ("π", "π", ""), 
+    # Row 5 - Dynamic angle mode
+    (st.session_state.angle_mode, "angle_toggle", ""), ("sinh", "sinh(", ""), ("cosh", "cosh(", ""), ("tanh", "tanh(", ""), ("π", "π", ""), 
     ("Rand", "Rand", ""), ("0", "0", "light"), (".", ".", "light"), ("+/-", "+/-", "light"), ("=", "=", "primary"),
 ]
 
@@ -464,11 +493,15 @@ for row in range(5):
             # Skip empty buttons
             if label:  
                 # Use primary type for orange buttons, default for others
-                # (Note: Streamlit doesn't support a 3rd color type natively without component tricks, 
-                # so we stick to Dark/Orange to ensure stability)
                 key_type = "primary" if kind == "primary" else "secondary"
-                # Add unique key to avoid duplicate IDs
-                c.button(label, on_click=calc_press, args=(val,), type=key_type, use_container_width=True, key=f"calc_btn_{idx}")
+                
+                # Special handling for mode toggle buttons
+                if val == "2nd":
+                    c.button(label, on_click=toggle_second_mode, type=key_type, use_container_width=True, key=f"calc_btn_{idx}")
+                elif val == "angle_toggle":
+                    c.button(label, on_click=toggle_angle_mode, type=key_type, use_container_width=True, key=f"calc_btn_{idx}")
+                else:
+                    c.button(label, on_click=calc_press, args=(val,), type=key_type, use_container_width=True, key=f"calc_btn_{idx}")
             idx += 1
 
 st.markdown("""
