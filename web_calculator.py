@@ -285,39 +285,54 @@ def calc_press(val):
     else:
         st.session_state.calc_expression += str(val)
 
-# Display
-st.text_input("", value=st.session_state.calc_expression, disabled=True, key="calc_display")
+# --- Calculator Container (Simulated Mobile Size) ---
+# We use columns to center and constrain the width
+spacer_left, calc_body, spacer_right = st.columns([1, 2, 1])
 
-# Layout: 4 columns, tight gap
-grid = st.columns(4, gap="small")
+with calc_body:
+    # Display Screen (Custom HTML for proper updates, unlike disabled text_input)
+    st.markdown(f"""
+        <div style='
+            font-family: "Courier New", monospace;
+            font-size: 2.5rem;
+            background-color: #000;
+            color: #fff;
+            text-align: right;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+            min-height: 70px;
+        '>{st.session_state.calc_expression if st.session_state.calc_expression else "0"}</div>
+    """, unsafe_allow_html=True)
 
-# Define Keyboard Layout
-# [Label, Value, type]
-# Type: 'default' (grey), 'primary' (orange), 'secondary' (light) - Streamlit only supports default/primary natively
-buttons = [
-    ("sin", "sin(", "default"), ("cos", "cos(", "default"), ("tan", "tan(", "default"), ("C", "C", "primary"),
-    ("√", "sqrt(", "default"),  ("^", "^", "default"),      ("π", "pi", "default"),     ("⌫", "⌫", "primary"),
-    ("7", "7", "default"),      ("8", "8", "default"),      ("9", "9", "default"),      ("÷", "÷", "primary"),
-    ("4", "4", "default"),      ("5", "5", "default"),      ("6", "6", "default"),      ("×", "×", "primary"),
-    ("1", "1", "default"),      ("2", "2", "default"),      ("3", "3", "default"),      ("−", "-", "primary"),
-    ("0", "0", "default"),      (".", ".", "default"),      ("(", "(", "default"),      ("+", "+", "primary"),
-    (")", ")", "default"),      ("", "", "default"),        ("", "", "default"),        ("=", "=", "primary"),
-]
+    # Define Keyboard Layout
+    # [Label, Value, type]
+    buttons = [
+        ("sin", "sin(", "default"), ("cos", "cos(", "default"), ("tan", "tan(", "default"), ("C", "C", "primary"),
+        ("√", "sqrt(", "default"),  ("^", "^", "default"),      ("π", "pi", "default"),     ("⌫", "⌫", "primary"),
+        ("7", "7", "default"),      ("8", "8", "default"),      ("9", "9", "default"),      ("÷", "÷", "primary"),
+        ("4", "4", "default"),      ("5", "5", "default"),      ("6", "6", "default"),      ("×", "×", "primary"),
+        ("1", "1", "default"),      ("2", "2", "default"),      ("3", "3", "default"),      ("−", "-", "primary"),
+        ("0", "0", "default"),      (".", ".", "default"),      ("(", "(", "default"),      ("+", "+", "primary"),
+        (")", ")", "default"),      ("", "", "default"),        ("", "", "default"),        ("=", "=", "primary"),
+    ]
 
-# Render Grid
-idx = 0
-for row in range(7):
-    cols = st.columns(4, gap="small")
-    for c in cols:
-        if idx < len(buttons):
-            label, val, kind = buttons[idx]
-            if label:
-                # We use the type='primary' to trigger the orange CSS we wrote above
-                if kind == 'primary':
-                    c.button(label, on_click=calc_press, args=(val,), type="primary", use_container_width=True)
-                else:
-                    c.button(label, on_click=calc_press, args=(val,), use_container_width=True)
-            idx += 1
+    # Render Grid
+    idx = 0
+    for row in range(7):
+        # Nested columns for the button grid
+        cols = st.columns(4, gap="small")
+        for c in cols:
+            if idx < len(buttons):
+                label, val, kind = buttons[idx]
+                if label:
+                    # We use the type='primary' to trigger the orange CSS we wrote above
+                    if kind == 'primary':
+                        c.button(label, on_click=calc_press, args=(val,), type="primary", use_container_width=True)
+                    else:
+                        c.button(label, on_click=calc_press, args=(val,), use_container_width=True)
+                idx += 1
 
 st.markdown("""
 ---
