@@ -378,80 +378,67 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------
-       4. MOBILE OPTIMIZATION: MARKER-BASED GRID (Portrait & Landscape)
+       4. MOBILE OPTIMIZATION: MARKER HACK (iPhone 12 Pro Max & Smaller)
        --------------------------------------------------------------------- */
-    @media only screen and (max-width: 800px) {
+    @media only screen and (max-width: 600px) {
         
-        /* GENERAL: Force Row Layout */
-        div[data-testid="stHorizontalBlock"] {
-            display: flex !important;
+        /* 
+           Target the horizontal block immediately following our marker container.
+           Using :has() to find the wrapper of the marker.
+        */
+        div:has(.mobile-row-fix) + div[data-testid="stHorizontalBlock"] {
             flex-direction: row !important;
             flex-wrap: nowrap !important;
-            width: 100% !important;
-            gap: 2px !important;
         }
 
-        /* BASIC MARKER: Force 4 Columns (25%) */
-        div:has(.basic-marker) + div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
-            width: 25% !important;
-            flex: 0 0 25% !important;
-            min-width: 0px !important;
-        }
-
-        /* SCIENTIFIC MARKER: Force 10 Columns (10%) */
-        div:has(.scientific-marker) + div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
-            width: 10% !important;
-            flex: 0 0 10% !important;
+        /* Target the columns inside that specific horizontal block */
+        div:has(.mobile-row-fix) + div [data-testid="column"] {
+            width: auto !important;
+            flex: 1 1 auto !important;
             min-width: 0px !important;
         }
         
-        /* HIDE MARKERS */
-        .basic-marker, .scientific-marker {
-            display: none !important;
-            height: 0 !important;
-            margin: 0 !important;
-        }
-        
-        /* Button Styling */
-        div.stButton > button {
-            height: 50px !important;
-            min-height: 50px !important;
-            padding: 0 !important;
-            font-size: 0.9rem !important;
-            border-radius: 8px !important;
+        /* Hide the marker container to prevent extra spacing */
+        div:has(.mobile-row-fix) {
+            height: 0px !important;
             margin: 0px !important;
-            width: 100% !important;
+            overflow: hidden !important;
+        }
+
+        /* Force buttons to be small and fit */
+        div.stButton > button {
+            height: 45px !important;
+            min-height: 45px !important;
+            padding: 0 !important;
+            font-size: 0.8rem !important; /* Smaller font */
+            border-radius: 8px !important;
+            margin: 2px !important;
+            aspect-ratio: auto !important; 
+        }
+
+        /* Adjust display size */
+        .calc-display {
+            font-size: 2.5rem !important;
+            margin-bottom: 5px !important;
         }
         
-        /* Toggle/Other Buttons */
-        div[data-testid="column"] > div.stButton {
-             width: 100% !important;
+        /* Toggle buttons */
+        button[key="basic_calc_btn"],
+        button[key="scientific_calc_btn"] {
+            height: 35px !important;
+            min-height: 35px !important;
+            font-size: 0.8rem !important;
+            padding: 4px 8px !important;
         }
     }
-    }
 
 </style>
 """, unsafe_allow_html=True)
 
-# Centered Layout Strategy:
-# Instead of using st.columns which can be unpredictable on mobile,
-# we constrain the main block's max-width via CSS.
+# Force narrow calculator by using 3-column layout with narrow center
+spacer_left, calc_column, spacer_right = st.columns([2, 3, 2])
 
-st.markdown("""
-<style>
-    /* Constrain the entire app's width on desktop to look like a calculator app */
-    .block-container {
-        max-width: 500px !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# Main container for the calculator
-calc_container = st.container()
-
-with calc_container:
+with calc_column:
     # Calculator mode toggle buttons - now within narrow column
     col1, col2 = st.columns(2)
     with col1:
@@ -628,7 +615,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Render Calculator in Center Column
-with calc_container:
+with calc_column:
     # Display
     st.markdown(f"""<div class='calc-display'>{st.session_state.calc_expression if st.session_state.calc_expression else "0"}</div>""", unsafe_allow_html=True)
 
@@ -653,7 +640,7 @@ with calc_container:
         # Render 4-column basic grid
         idx = 0
         for row in range(5):
-            st.markdown('<div class="basic-marker"></div>', unsafe_allow_html=True)
+            st.markdown('<div class="mobile-row-fix"></div>', unsafe_allow_html=True)
             cols = st.columns(4, gap="small")
             for c in cols:
                 if idx < len(basic_buttons):
@@ -693,7 +680,7 @@ with calc_container:
         # Render 10-column Grid
         idx = 0
         for row in range(5):
-            st.markdown('<div class="scientific-marker"></div>', unsafe_allow_html=True)
+            st.markdown('<div class="mobile-row-fix"></div>', unsafe_allow_html=True)
             cols = st.columns(10, gap="small")
             for c in cols:
                 if idx < len(buttons):
