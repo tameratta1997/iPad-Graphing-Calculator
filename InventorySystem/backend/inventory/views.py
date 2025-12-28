@@ -3,10 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, F, Count
 from django.db import models
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 import csv
 import openpyxl
 from .models import Product, StockLog, Category
-from .forms import ProductForm, ImportFileForm
+from .forms import ProductForm, ImportFileForm, CustomUserCreationForm, CustomUserChangeForm
 
 @login_required
 def dashboard(request):
@@ -38,6 +41,7 @@ def product_list(request):
     return render(request, 'inventory/product_list.html', context)
 
 @login_required
+@permission_required('inventory.add_product', raise_exception=True)
 def product_create(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
@@ -56,6 +60,7 @@ def product_create(request):
     return render(request, 'inventory/product_form.html', {'form': form, 'title': 'Add Product'})
 
 @login_required
+@permission_required('inventory.change_product', raise_exception=True)
 def product_update(request, pk):
     product = get_object_or_404(Product, pk=pk)
     old_qty = product.quantity
@@ -79,6 +84,7 @@ def product_update(request, pk):
     return render(request, 'inventory/product_form.html', {'form': form, 'title': 'Edit Product'})
 
 @login_required
+@permission_required('inventory.delete_product', raise_exception=True)
 def product_delete(request, pk):
     product = get_object_or_404(Product, pk=pk)
     if request.method == 'POST':
@@ -92,6 +98,7 @@ def category_list(request):
     return render(request, 'inventory/category_list.html', {'categories': categories})
 
 @login_required
+@permission_required('inventory.add_category', raise_exception=True)
 def category_create(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -102,6 +109,7 @@ def category_create(request):
     return render(request, 'inventory/category_form.html')
 
 @login_required
+@permission_required('inventory.delete_category', raise_exception=True)
 def category_delete(request, pk):
     category = get_object_or_404(Category, pk=pk)
     if request.method == 'POST':
@@ -110,6 +118,7 @@ def category_delete(request, pk):
     return render(request, 'inventory/category_confirm_delete.html', {'category': category})
 
 @login_required
+@permission_required('inventory.add_product', raise_exception=True)
 def product_import(request):
     if request.method == 'POST':
         form = ImportFileForm(request.POST, request.FILES)
@@ -196,6 +205,52 @@ def product_import(request):
         form = ImportFileForm()
     
     return render(request, 'inventory/product_import.html', {'form': form})
+
+@user_passes_test(lambda u: u.is_superuser)
+def user_list(request):
+    users = User.objects.all()
+    return render(request, 'inventory/user_list.html', {'users': users})
+
+@user_passes_test(lambda u: u.is_superuser)
+def user_create(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'New user created and permissions assigned successfully.')
+            return redirect('user_list')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'inventory/user_form.html', {'form': form, 'title': 'Create New User'})
+
+@user_passes_test(lambda u: u.is_superuser)
+def user_update(request, pk):
+    user_to_edit = get_object_or_404(User, pk=pk)
+    if request.method == 'POST':
+        form = CustomUserChangeForm(request.POST, instance=user_to_edit)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'User {user_to_edit.username} updated successfully.')
+            return redirect('user_list')
+    else:
+        form = CustomUserChangeForm(instance=user_to_edit)
+    return render(request, 'inventory/user_form.html', {'form': form, 'title': f'Edit User: {user_to_edit.username}'})
+
+@user_passes_test(lambda u: u.is_superuser)
+def user_delete(request, pk):
+    user_to_delete = get_object_or_404(User, pk=pk)
+    
+    # Prevent self-deletion
+    if user_to_delete == request.user:
+        messages.error(request, "You cannot delete your own account.")
+        return redirect('user_list')
+        
+    if request.method == 'POST':
+        user_to_delete.delete()
+        messages.success(request, f"User {user_to_delete.username} deleted successfully.")
+        return redirect('user_list')
+    
+    return render(request, 'inventory/user_confirm_delete.html', {'user_to_delete': user_to_delete})
 
 # API Views
 from rest_framework import viewsets

@@ -7,16 +7,18 @@
         <p class="text-muted">Manage your product catalog.</p>
     </div>
     <div style="display: flex; gap: 0.5rem;">
+        {% if perms.inventory.add_product %}
         <a href="{% url 'product_import' %}" class="btn"
             style="background-color: var(--secondary-color); color: white;"> Import CSV/Excel</a>
         <a href="{% url 'product_create' %}" class="btn btn-primary"> + Add Product </a>
+        {% endif %}
     </div>
 </div>
 
 <div class="card">
     <!-- Search Bar -->
-    <form method="GET" class="flex mb-4" style="gap: 1rem;">
-        <input type="text" name="q" class="form-input" placeholder="Search by name or code..."
+    <form method="GET" class="flex mb-4" style="gap: 1rem;" onsubmit="return false;">
+        <input id="search-input" type="search" name="q" class="form-input" placeholder="Search by name or code..."
             value="{{ request.GET.q|default:'' }}" style="max-width: 300px;">
         <button type="submit" class="btn"
             style="background-color: var(--secondary-color); color: white;">Search</button>
@@ -35,7 +37,7 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="product-table-body">
                 {% for product in products %}
                 <tr>
                     <td>
@@ -67,10 +69,14 @@
                         </span>
                     </td>
                     <td>
+                        {% if perms.inventory.change_product %}
                         <a href="{% url 'product_update' product.pk %}" class="btn"
                             style="padding: 0.25rem 0.5rem; font-size: 0.75rem; background: #DBEAFE; color: #1E40AF;">Edit</a>
+                        {% endif %}
+                        {% if perms.inventory.delete_product %}
                         <a href="{% url 'product_delete' product.pk %}" class="btn"
                             style="padding: 0.25rem 0.5rem; font-size: 0.75rem; background: #FEE2E2; color: #991B1B;">Del</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}
@@ -82,4 +88,38 @@
         </table>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search-input');
+        const tableBody = document.getElementById('product-table-body');
+        let timeout = null;
+
+        if (searchInput && tableBody) {
+            searchInput.addEventListener('input', function (e) {
+                clearTimeout(timeout);
+                const query = e.target.value.trim();
+
+                timeout = setTimeout(() => {
+                    // Update URL without reloading (optional)
+                    // window.history.replaceState(null, '', `?q=${encodeURIComponent(query)}`);
+
+                    const url = `${window.location.pathname}?q=${encodeURIComponent(query)}`;
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            const newBody = doc.getElementById('product-table-body');
+
+                            if (newBody) {
+                                tableBody.innerHTML = newBody.innerHTML;
+                            }
+                        })
+                        .catch(err => console.error('Search failed:', err));
+                }, 100); // 100ms debounce for near-instant feel
+            });
+        }
+    });
+</script>
 {% endblock %}

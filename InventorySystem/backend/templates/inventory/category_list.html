@@ -6,9 +6,11 @@
         <h1 style="font-size: 1.875rem; font-weight: 700;">Categories</h1>
         <p class="text-muted">Manage product categories.</p>
     </div>
+    {% if perms.inventory.add_category %}
     <a href="{% url 'category_create' %}" class="btn btn-primary">
         + Add Category
     </a>
+    {% endif %}
 </div>
 
 <div class="card">
@@ -29,8 +31,10 @@
                     <td class="text-muted">{{ cat.description|default:"-" }}</td>
                     <td><span class="badge badge-green">{{ cat.product_count }} Products</span></td>
                     <td>
+                        {% if perms.inventory.delete_category %}
                         <a href="{% url 'category_delete' cat.pk %}" class="btn"
                             style="padding: 0.25rem 0.5rem; font-size: 0.75rem; background: #FEE2E2; color: #991B1B;">Del</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}
