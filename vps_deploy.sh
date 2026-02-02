@@ -29,7 +29,7 @@ fi
 echo "Setting up Python environment..."
 python3 -m venv venv
 source venv/bin/activate
-pip install flask gunicorn beautifulsoup4 requests
+pip install -r requirements.txt
 
 # 5. Systemd Service
 echo "Creating Gunicorn service..."
@@ -50,7 +50,7 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl start gold_app
+systemctl restart gold_app
 systemctl enable gold_app
 
 # 6. Nginx Configuration
