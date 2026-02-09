@@ -1,0 +1,35 @@
+# SaghaLive - Google Play Store Listing Metadata
+
+## 1. App Details
+*   **App Name**: SaghaLive: Gold & Silver Prices
+*   **Short Description**: Live gold & silver prices in Egypt with advanced fee calculator and insights.
+*   **Category**: Finance
+*   **Content Rating**: Everyone
+
+## 2. Description (Full - Max 4000 chars)
+SaghaLive is your premium companion for tracking the precious metals market in Egypt. Stay ahead with real-time updates on Gold (24K, 21K, 18K) and Silver prices, calculated with the highest precision.
+
+Key Features:
+- **Live Market Prices**: Real-time tracking of Gold and Silver prices in EGP and USD.
+- **Advanced Fee Calculator**: Calculate the total cost of bars and coins from major providers like BTC, SAM, and more, including making costs (Masnaia).
+- **Market Analysis & Insights**: Get smart indicators and PNL (Daily Change) tracking to help you make informed investment decisions.
+- **Smart Budget Planner**: Receive professional investment advice tailored to your wallet with automated allocation plans.
+- **Provider-Specific Data**: Filter weights and fees for leading companies in the Egyptian market.
+- **Multilingual Support**: Available in both Arabic and English.
+- **Historical Charts**: Track price trends over various timeframes.
+
+Whether you are an investor or just looking to buy a gold coin, SaghaLive provides the raw data and tools you need to calculate exact costs before you visit the jeweler.
+
+## 3. Contact Information
+*   **Website**: https://saghalive.com
+*   **Developer Email**: info@saghalive.com
+*   **Privacy Policy URL**: https://saghalive.com/privacy-policy
+
+## 4. Graphics Requirements (Drafted/Generated)
+*   **App Icon**: 512x512 PNG (Transparent requested).
+*   **Feature Graphic**: 1024x500 PNG.
+*   **Screenshots**: Minimum 2 phone screenshots (Phone, 7" tablet, 10" tablet recommended).
+
+## 5. Data Safety Info
+*   **Data Collection**: No personal information is collected or shared with third parties.
+*   **Encryption**: All data transmitted over HTTPS.

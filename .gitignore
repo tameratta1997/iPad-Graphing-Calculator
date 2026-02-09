@@ -17,3 +17,9 @@ dist/
 # IDEs
 .vscode/
 .idea/
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml

@@ -1,0 +1,15 @@
+# Flutter Wrapper
+-keep class io.flutter.app.** { *; }
+-keep class io.flutter.plugin.** { *; }
+-keep class io.flutter.util.** { *; }
+-keep class io.flutter.view.** { *; }
+-keep class io.flutter.** { *; }
+-keep class io.flutter.plugins.** { *; }
+-keep class com.google.android.gms.internal.** { *; }
+-keep class com.google.android.gms.common.internal.safeparcel.SafeParcelable { *; }
+-keep class com.google.android.gms.common.annotation.KeepName { *; }
+-keep class com.google.android.gms.common.util.RetainForClient { *; }
+-keep class com.google.android.gms.common.util.DynamiteApi { *; }
+-keep class com.google.firebase.** { *; }
+-dontwarn io.flutter.embedding.**
+-ignorewarnings
